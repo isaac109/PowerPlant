@@ -9,15 +9,15 @@ public class gridManager : MonoBehaviour {
     static int height = 60;
     public GameObject[][] tiles = new GameObject[height][];
 
-    public float percentOcean = .5f;
-    public float percentOceanSeed = 10;
-    public GameObject[] ocean;
-    int oceanCounter = 0;
-    bool oceanCreated = false;
+    float percentLand = .25f;
+    float percentLandSeed = 10;
+    public GameObject[] land;
+    int landCounter = 0;
+    bool landCreated = false;
 	// Use this for initialization
 	void Start () {
-        percentOcean = (float)(height * width) * percentOcean / 100;
-        ocean = new GameObject[(int) percentOcean];
+        percentLand = (int)((float)(height * width) * percentLand);
+        land = new GameObject[(int)percentLand];
         for (int i = 0; i < height; i++)
         {
             tiles[i] = new GameObject[width];
@@ -36,15 +36,15 @@ public class gridManager : MonoBehaviour {
                 temp.GetComponent<hexTile2>().gm = this.GetComponent<gridManager>();
                 tiles[i][j] = temp;
                 float num = Random.Range(0f, (float)(height*width));
-                if (num <= percentOceanSeed)
+                if (num <= percentLandSeed && land.Length > landCounter)
                 {
-                    temp.GetComponent<hexTile2>().setTerrain(1);
-                    ocean[oceanCounter] = temp;
-                    oceanCounter++;
+                    temp.GetComponent<hexTile2>().setTerrain(2);
+                    land[landCounter] = temp;
+                    landCounter++;
                 }
                 else
                 {
-                    temp.GetComponent<hexTile2>().setTerrain(2);
+                    temp.GetComponent<hexTile2>().setTerrain(1);
                 }
             }
         }
@@ -54,25 +54,25 @@ public class gridManager : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-        if (tiles[height - 1][width - 1].GetComponent<hexTile2>().searched && !oceanCreated)
+        if (tiles[height - 1][width - 1].GetComponent<hexTile2>().searched && !landCreated)
         {
             createOcean();
-            oceanCreated = true;
+            landCreated = true;
         }
 	}
     void createOcean()
     {
-        for (int i = 0; i < ocean.Length; i++)
+        for (int i = 0; i < land.Length; i++)
         {
             GameObject[] neighbors = new GameObject[6];
-            neighbors = ocean[i].GetComponent<hexTile2>().neighbors;
-            float num = Random.Range(0f, (float)ocean[i].GetComponent<hexTile2>().counter); 
+            neighbors = land[i].GetComponent<hexTile2>().neighbors;
+            float num = Random.Range(0f, (float)land[i].GetComponent<hexTile2>().counter); 
             for (int j = 0; j < num; j++)
             {
-                if (!contains(neighbors[j], ocean))
+                if (!contains(neighbors[j], land))
                 {
-                    ocean = addToBack(neighbors[j], ocean);
-                    neighbors[j].GetComponent<hexTile2>().setTerrain(1);
+                    land = addToBack(neighbors[j], land);
+                    neighbors[j].GetComponent<hexTile2>().setTerrain(2);
                 }
             }
         }

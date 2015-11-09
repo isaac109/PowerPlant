@@ -8,17 +8,10 @@ public class cameraControl : MonoBehaviour {
 
     float cameraDistanceMax = 360f;
     float cameraDistanceMin = 20f;
-    float cameraDistance = 100f;
+    public float cameraDistance = 100f;
     float scrollSpeed = 100f;
 
-    /*float xmin = 12f;
-    float xmax = 672f;
-    float ymin = -5f;
-    float ymax = -310f;
-    float xcent = 345f;
-    float zcent = -150f;
-
-    float cxmin;*/
+    public bool canControl = true;
 
 	// Use this for initialization
 	void Start () {
@@ -27,16 +20,19 @@ public class cameraControl : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetMouseButton(1))
+        if (canControl)
         {
-            float h = horSpeed * Input.GetAxis("Mouse X");
-            float v = verspeed * Input.GetAxis("Mouse Y");
-            this.transform.Translate(-h, -v, 0);
+            if (Input.GetMouseButton(1))
+            {
+                float h = horSpeed * Input.GetAxis("Mouse X");
+                float v = verspeed * Input.GetAxis("Mouse Y");
+                this.transform.Translate(-h, -v, 0);
+            }
+            cameraDistance += Input.GetAxis("Mouse ScrollWheel") * scrollSpeed;
+            cameraDistance = Mathf.Clamp(cameraDistance, cameraDistanceMin, cameraDistanceMax);
+            this.transform.position = new Vector3(this.transform.position.x, cameraDistance, this.transform.position.z);
+            cameraBounds();
         }
-        cameraDistance += Input.GetAxis("Mouse ScrollWheel") * scrollSpeed;
-        cameraDistance = Mathf.Clamp(cameraDistance, cameraDistanceMin, cameraDistanceMax);
-        this.transform.position = new Vector3(this.transform.position.x, cameraDistance, this.transform.position.z);
-        cameraBounds();
 	}
 
     void cameraBounds()
