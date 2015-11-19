@@ -18,9 +18,25 @@ public class hexTile2 : MonoBehaviour {
 
     public Material mountain;
     public Material water;
+    public Material desert;
+    public Material plains;
+    public Material valley;
+    public Material hills;
+    public Material marsh;
+    public Material forest;
+    public Material tundra;
 
     public bool isOcean = false;
+    public bool isLand = false;
     public bool isMountain = false;
+    public bool isDesert = false;
+    public bool isPlains = false;
+    public bool isValley = false;
+    public bool isHills = false;
+    public bool isMarshes = false;
+    public bool isForest = false;
+    public bool isTundra = false;
+    public bool isCoast = false;
     public bool isChecked = false;
     public bool isMouseOver = false;
     public bool isSelected = false;
@@ -76,6 +92,15 @@ public class hexTile2 : MonoBehaviour {
 
     public void setTerrain(int i)
     {
+        isOcean = false;
+        isMountain = false;
+        isDesert = false;
+        isPlains = false;
+        isValley = false;
+        isHills = false;
+        isMarshes = false;
+        isForest = false;
+        isTundra = false;
         switch (i)
         {
             case 1:
@@ -85,6 +110,34 @@ public class hexTile2 : MonoBehaviour {
             case 2:
                 this.GetComponent<Renderer>().material = mountain;
                 isMountain = true;
+                break;
+            case 3:
+                this.GetComponent<Renderer>().material = desert;
+                isDesert = true;
+                break;
+            case 4:
+                this.GetComponent<Renderer>().material = plains;
+                isPlains = true;
+                break;
+            case 5:
+                this.GetComponent<Renderer>().material = valley;
+                isValley = true;
+                break;
+            case 6:
+                this.GetComponent<Renderer>().material = hills;
+                isHills = true;
+                break;
+            case 7:
+                this.GetComponent<Renderer>().material = marsh;
+                isMarshes = true;
+                break;
+            case 8:
+                this.GetComponent<Renderer>().material = forest;
+                isForest = true;
+                break;
+            case 9:
+                this.GetComponent<Renderer>().material = tundra;
+                isTundra = true;
                 break;
         }
     }
