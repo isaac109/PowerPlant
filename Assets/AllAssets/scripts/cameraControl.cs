@@ -6,15 +6,25 @@ public class cameraControl : MonoBehaviour {
     float horSpeed = 20f;
     float verspeed = 20f;
 
-    float cameraDistanceMax = 360f;
+    float cameraDistanceMax = 260f;
     float cameraDistanceMin = 20f;
+    float cameraWidthMax = 0;
+    float cameraHeightMax = 0;
     public float cameraDistance = 100f;
     float scrollSpeed = 100f;
 
     public bool canControl = true;
 
+    public gridManager gm;
+
 	// Use this for initialization
 	void Start () {
+        while(!gm.done)
+        {
+        }
+        this.transform.position = new Vector3(gm.maxWidth/2, this.transform.position.y, gm.maxHeight/2);
+        cameraDistanceMax = (float)gm.cwidth * (8f+(2.0f/3.0f));
+        cameraDistance = cameraDistanceMax;
 	
 	}
 	
@@ -32,6 +42,24 @@ public class cameraControl : MonoBehaviour {
             cameraDistance = Mathf.Clamp(cameraDistance, cameraDistanceMin, cameraDistanceMax);
             this.transform.position = new Vector3(this.transform.position.x, cameraDistance, this.transform.position.z);
             cameraBounds();
+        }
+        cameraWidthMax = (cameraDistance / cameraDistanceMax) * gm.maxWidth/2;
+        cameraHeightMax = (cameraDistance / cameraDistanceMax) * gm.maxHeight / 2;
+        if (this.transform.position.x < cameraWidthMax)
+        {
+            this.transform.position = new Vector3(cameraWidthMax, this.transform.position.y, this.transform.position.z);
+        }
+        if (this.transform.position.x > gm.maxWidth - cameraWidthMax)
+        {
+            this.transform.position = new Vector3(gm.maxWidth - cameraWidthMax, this.transform.position.y, this.transform.position.z);
+        }
+        if (this.transform.position.z < cameraHeightMax)
+        {
+            this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, cameraHeightMax);
+        }
+        if (this.transform.position.z > gm.maxHeight - cameraHeightMax)
+        {
+            this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, gm.maxHeight - cameraHeightMax);
         }
 	}
 

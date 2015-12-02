@@ -103,6 +103,7 @@ public class hexTile2 : MonoBehaviour {
             menuCamera.enabled = true;
             mainCamera.rect = new Rect(0f, .5f, 1f, 2f);
             cameraDistance = mainCamera.gameObject.transform.position.y;
+            mainCamera.GetComponent<cameraControl>().cameraDistance = 20;
             mainCamera.gameObject.transform.position = new Vector3(this.transform.position.x, 20, this.transform.position.z);
             this.GetComponent<hexManagement>().show = true;
             isSelected = true;

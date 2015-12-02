@@ -7,6 +7,7 @@ public class gridManager : MonoBehaviour {
     public bool done = false;
     static int width = 30;
     static int height = 60;
+    public int cwidth = 0;
     public GameObject[][] tiles = new GameObject[height][];
 
     float percentLand = .25f;
@@ -29,8 +30,8 @@ public class gridManager : MonoBehaviour {
     int forestNum = 0;
     int tundraNum = 0;
 
-    float maxHeight = 0;
-    float maxWidth = 0;
+    public float maxHeight = 0;
+    public float maxWidth = 0;
 	// Use this for initialization
 	void Start () {
         int newPercentLand = (int)((float)(height * width) * percentLand);
@@ -70,6 +71,7 @@ public class gridManager : MonoBehaviour {
         maxWidth = tiles[height - 1][width - 1].transform.position.x;
         cityNum = (int)((float)(height * width)*(float)(percentCity));
         Debug.Log("cityNum " + cityNum.ToString());
+        cwidth = width;
         done = true;
 	}
 
