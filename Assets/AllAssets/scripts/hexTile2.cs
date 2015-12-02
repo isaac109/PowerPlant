@@ -26,6 +26,17 @@ public class hexTile2 : MonoBehaviour {
     public Material forest;
     public Material tundra;
 
+    public Material volcano;
+    public Material highWind;
+    public Material denseTrees;
+    public Material hotSpot;
+    public Material coal;
+    public Material naturalGas;
+    public Material earthQuake;
+    public Material river;
+
+    public Material city;
+
     public bool isOcean = false;
     public bool isLand = false;
     public bool isMountain = false;
@@ -37,9 +48,21 @@ public class hexTile2 : MonoBehaviour {
     public bool isForest = false;
     public bool isTundra = false;
     public bool isCoast = false;
+
     public bool isChecked = false;
     public bool isMouseOver = false;
     public bool isSelected = false;
+
+    public bool hasVolcano = false;
+    public bool hasHighWinds = false;
+    public bool hasDenseTrees = false;
+    public bool hasHotSpot = false;
+    public bool hasCoal = false;
+    public bool hasNarutalGas = false;
+    public bool hasEarthQuake = false;
+    public bool hasRiver = false;
+
+    public bool hasCity = false;
     
     public Camera mainCamera;
     public Camera menuCamera;
@@ -53,6 +76,10 @@ public class hexTile2 : MonoBehaviour {
         }
         mainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
         menuCamera = GameObject.Find("Camera").GetComponent<Camera>();
+        for (int i = 0; i < borders.Length; i++)
+        {
+            borders[i].SetActive(false);
+        }
     }
 
     // Update is called once per frame
@@ -140,6 +167,57 @@ public class hexTile2 : MonoBehaviour {
                 isTundra = true;
                 break;
         }
+    }
+    public void setModifier(int i)
+    {
+        hasVolcano = false;
+        hasHotSpot = false;
+        hasHighWinds = false;
+        hasRiver = false;
+        hasEarthQuake = false;
+        hasNarutalGas = false;
+        hasDenseTrees = false;
+        hasCoal = false;
+        switch (i)
+        {
+            case 1:
+                this.GetComponent<Renderer>().material = volcano;
+                hasVolcano = true;
+                break;
+            case 2:
+                this.GetComponent<Renderer>().material = hotSpot;
+                hasHotSpot = true;
+                break;
+            case 3:
+                this.GetComponent<Renderer>().material = highWind;
+                hasHighWinds = true;
+                break;
+            case 4:
+                this.GetComponent<Renderer>().material = river;
+                hasRiver = true;
+                break;
+            case 5:
+                this.GetComponent<Renderer>().material = earthQuake;
+                hasEarthQuake = true;
+                break;
+            case 6:
+                this.GetComponent<Renderer>().material = naturalGas;
+                hasNarutalGas = true;
+                break;
+            case 7:
+                this.GetComponent<Renderer>().material = denseTrees;
+                hasDenseTrees = true;
+                break;
+            case 8:
+                this.GetComponent<Renderer>().material = coal;
+                hasCoal = true;
+                break;
+        }
+    }
+    public void setCity()
+    {
+        this.GetComponent<Renderer>().material = city;
+        hasCity = true;
     }
 
     void OnMouseOver()

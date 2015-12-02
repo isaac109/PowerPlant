@@ -9,8 +9,12 @@ public class gridManager : MonoBehaviour {
     static int height = 60;
     public GameObject[][] tiles = new GameObject[height][];
 
-    float percentLand = .5f;
+    float percentLand = .25f;
     float percentLandSeed = 10;
+    int percentModifier = 5;
+    float percentCity = .025f;
+    int cityNum = 0;
+    int cityCounter = 0;
     public GameObject[] land;
     int landCounter = 0;
     bool landCreated = false;
@@ -24,6 +28,9 @@ public class gridManager : MonoBehaviour {
     int marshNum = 0;
     int forestNum = 0;
     int tundraNum = 0;
+
+    float maxHeight = 0;
+    float maxWidth = 0;
 	// Use this for initialization
 	void Start () {
         int newPercentLand = (int)((float)(height * width) * percentLand);
@@ -59,6 +66,10 @@ public class gridManager : MonoBehaviour {
                 }
             }
         }
+        maxHeight = tiles[height - 1][width - 1].transform.position.z;
+        maxWidth = tiles[height - 1][width - 1].transform.position.x;
+        cityNum = (int)((float)(height * width)*(float)(percentCity));
+        Debug.Log("cityNum " + cityNum.ToString());
         done = true;
 	}
 
@@ -67,13 +78,192 @@ public class gridManager : MonoBehaviour {
     {
         if (tiles[height - 1][width - 1].GetComponent<hexTile2>().searched && !landCreated)
         {
+            establishBorderNeighbors();
             createOcean();
             landCreated = true;
             createLand();
             clearIslands();
             setCostal();
+            setModifiers();
+            setCitys();
+            //createExtraMaps();
         }
 	}
+    void setCitys()
+    {
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                if (!tiles[i][j].GetComponent<hexTile2>().hasCity && cityCounter < cityNum && !tiles[i][j].GetComponent<hexTile2>().isOcean)
+                {
+                    int r = Random.Range(0, 99);
+                    if (r <= percentCity*100)
+                    {
+                        tiles[i][j].GetComponent<hexTile2>().setCity();
+                        cityCounter++;
+                    }
+                }
+            }
+        }
+        if (cityCounter < cityNum)
+        {
+            setCitys();
+        }
+    }
+    void setModifiers()
+    {
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            { 
+                if (!tiles[i][j].GetComponent<hexTile2>().isOcean)
+                {
+                    int mod = Random.Range(1, 9);
+                    int r = Random.Range(0, 100);
+                    if (r <= percentModifier)
+                    {
+                        tiles[i][j].GetComponent<hexTile2>().setModifier(mod);
+                    }
+                    else if (r <= 3 * percentModifier)
+                    {
+                        if (mod == 1 && tiles[i][j].GetComponent<hexTile2>().isMountain)
+                        {
+                            tiles[i][j].GetComponent<hexTile2>().setModifier(mod);
+                        }
+                        if (mod == 2 && tiles[i][j].GetComponent<hexTile2>().isDesert)
+                        {
+                            tiles[i][j].GetComponent<hexTile2>().setModifier(mod);
+                        }
+                        if (mod == 3 && tiles[i][j].GetComponent<hexTile2>().isPlains)
+                        {
+                            tiles[i][j].GetComponent<hexTile2>().setModifier(mod);
+                        }
+                        if (mod == 4 && tiles[i][j].GetComponent<hexTile2>().isValley)
+                        {
+                            tiles[i][j].GetComponent<hexTile2>().setModifier(mod);
+                        }
+                        if (mod == 5 && tiles[i][j].GetComponent<hexTile2>().isPlains)
+                        {
+                            tiles[i][j].GetComponent<hexTile2>().setModifier(mod);
+                        }
+                        if (mod == 6 && tiles[i][j].GetComponent<hexTile2>().isMarshes)
+                        {
+                            tiles[i][j].GetComponent<hexTile2>().setModifier(mod);
+                        }
+                        if (mod == 7 && tiles[i][j].GetComponent<hexTile2>().isForest)
+                        {
+                            tiles[i][j].GetComponent<hexTile2>().setModifier(mod);
+                        }
+                        if (mod == 8 && tiles[i][j].GetComponent<hexTile2>().isTundra)
+                        {
+                            tiles[i][j].GetComponent<hexTile2>().setModifier(mod);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    void createExtraMaps()
+    {
+       // GameObject temp = Instantiate(tiles[0][0], new Vector3(tiles[0][0].transform.position.x, tiles[0][0].transform.position.y, tiles[0][0].transform.position.z+maxHeight+5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
+       // temp = Instantiate(tiles[0][1], new Vector3(tiles[1][0].transform.position.x, tiles[1][0].transform.position.y, tiles[1][0].transform.position.z + maxHeight + 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
+       // temp = Instantiate(tiles[0][0], new Vector3(tiles[0][0].transform.position.x + 5 * Mathf.Sqrt(3)+maxWidth, tiles[0][0].transform.position.y, tiles[0][0].transform.position.z), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width/2; j++)
+            {
+                GameObject temp = Instantiate(tiles[i][j], new Vector3(tiles[i][j].transform.position.x, tiles[i][j].transform.position.y, tiles[i][j].transform.position.z + maxHeight + 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
+                temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c1";
+                temp = Instantiate(tiles[i][j + width / 2], new Vector3(tiles[i][j + width / 2].transform.position.x, tiles[i][j + width / 2].transform.position.y, tiles[i][j + width / 2].transform.position.z - maxHeight - 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
+                temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c2";
+            }
+        }
+        for (int i = 0; i < height/2; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                GameObject temp = Instantiate(tiles[i][j], new Vector3(tiles[i][j].transform.position.x + 5 * Mathf.Sqrt(3) + maxWidth, tiles[i][j].transform.position.y, tiles[i][j].transform.position.z), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
+                temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c3";
+                temp = Instantiate(tiles[i + height / 2][j], new Vector3(tiles[i + height / 2][j].transform.position.x - 5 * Mathf.Sqrt(3) - maxWidth, tiles[i + height / 2][j].transform.position.y, tiles[i + height / 2][j].transform.position.z), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
+                temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c4";
+            }
+        }
+        for (int i = 0; i < height / 2; i++)
+        {
+            for (int j = 0; j < width/2; j++)
+            {
+                GameObject temp = Instantiate(tiles[i][j], new Vector3(tiles[i][j].transform.position.x + 5 * Mathf.Sqrt(3) + maxWidth, tiles[i][j].transform.position.y, tiles[i][j].transform.position.z + maxHeight + 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
+                temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c5";
+                temp = Instantiate(tiles[i + height / 2][j], new Vector3(tiles[i + height / 2][j].transform.position.x - 5 * Mathf.Sqrt(3) - maxWidth, tiles[i + height / 2][j].transform.position.y, tiles[i + height / 2][j].transform.position.z + maxHeight + 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
+                temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c6";
+                temp = Instantiate(tiles[i][j + width / 2], new Vector3(tiles[i][j + width / 2].transform.position.x + 5 * Mathf.Sqrt(3) + maxWidth, tiles[i][j + width / 2].transform.position.y, tiles[i][j + width / 2].transform.position.z - maxHeight - 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
+                temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c7";
+                temp = Instantiate(tiles[i + height / 2][j + width / 2], new Vector3(tiles[i + height / 2][j + width / 2].transform.position.x - 5 * Mathf.Sqrt(3) - maxWidth, tiles[i + height / 2][j + width / 2].transform.position.y, tiles[i + height / 2][j + width / 2].transform.position.z - maxHeight - 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
+                temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c8";
+            }
+        }
+    }
+    void establishBorderNeighbors()
+    {
+        for(int i=0; i < height; i++)
+        {
+            for(int j = 0; j < width; j++)
+            {
+                if (j == width-1)
+                {
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[5] = tiles[i][0];
+                    if (i % 2 != 0 && i != height-1)
+                    {
+                        tiles[i][j].GetComponent<hexTile2>().neighbors[3] = tiles[i - 1][0];
+                        tiles[i][j].GetComponent<hexTile2>().neighbors[4] = tiles[i + 1][0];
+                    }
+                }
+                if (j == 0)
+                {
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[5] = tiles[i][width-1];
+                    if (i % 2 == 0 && i != 0)
+                    {
+                        tiles[i][j].GetComponent<hexTile2>().neighbors[3] = tiles[i - 1][width - 1];
+                        tiles[i][j].GetComponent<hexTile2>().neighbors[4] = tiles[i + 1][width - 1];
+                    }
+                }
+                if (i == 0 && (j != 0 && j != width - 1))
+                {
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[4] = tiles[height - 1][j];
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[5] = tiles[height - 1][j - 1];
+                }
+                if (i == height - 1 && (j != 0 && j != width - 1))
+                {
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[4] = tiles[0][j];
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[5] = tiles[0][j + 1];
+                }
+                if (i == 0 && j == 0)
+                {
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[2] = tiles[1][width - 1];
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[3] = tiles[height - 1][width - 1];
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[4] = tiles[height - 1][0];
+                }
+                if (i == height - 1 && j == width - 1)
+                {
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[2] = tiles[height - 2][0];
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[3] = tiles[0][0];
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[4] = tiles[0][width - 1];
+                }
+                if (i == height - 1 && j == 0)
+                {
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[3] = tiles[0][0];
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[4] = tiles[0][1];
+                }
+                if (i == 0 && j == width - 1)
+                {
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[3] = tiles[height - 1][width - 1];
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[4] = tiles[height - 1][width - 2];
+                }
+                tiles[i][j].GetComponent<hexTile2>().counter = 6;
+            }
+        }
+    }
     void setCostal()
     {
         for (int i = 0; i < height; i++)
