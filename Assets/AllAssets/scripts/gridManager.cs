@@ -10,7 +10,7 @@ public class gridManager : MonoBehaviour {
     public int cwidth = 0;
     public GameObject[][] tiles = new GameObject[height][];
 
-    float percentLand = .25f;
+    float percentLand = .5f;
     float percentLandSeed = 10;
     int percentModifier = 5;
     float percentCity = .025f;
@@ -88,7 +88,7 @@ public class gridManager : MonoBehaviour {
             setCostal();
             setModifiers();
             setCitys();
-            //createExtraMaps();
+            createExtraMaps();
         }
 	}
     void setCitys()
@@ -173,36 +173,60 @@ public class gridManager : MonoBehaviour {
        // temp = Instantiate(tiles[0][0], new Vector3(tiles[0][0].transform.position.x + 5 * Mathf.Sqrt(3)+maxWidth, tiles[0][0].transform.position.y, tiles[0][0].transform.position.z), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
         for (int i = 0; i < height; i++)
         {
-            for (int j = 0; j < width/2; j++)
+            for (int j = 0; j < 5; j++)
             {
                 GameObject temp = Instantiate(tiles[i][j], new Vector3(tiles[i][j].transform.position.x, tiles[i][j].transform.position.y, tiles[i][j].transform.position.z + maxHeight + 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c1";
-                temp = Instantiate(tiles[i][j + width / 2], new Vector3(tiles[i][j + width / 2].transform.position.x, tiles[i][j + width / 2].transform.position.y, tiles[i][j + width / 2].transform.position.z - maxHeight - 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
+                temp.GetComponent<hexTile2>().removeScript();
+                temp.AddComponent<mockHex>();
+                temp.GetComponent<mockHex>().realHex = tiles[i][j];
+                temp = Instantiate(tiles[i][j + width-5], new Vector3(tiles[i][j + width-5].transform.position.x, tiles[i][j + width-5].transform.position.y, tiles[i][j + width-5].transform.position.z - maxHeight - 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c2";
+                temp.GetComponent<hexTile2>().removeScript();
+                temp.AddComponent<mockHex>();
+                temp.GetComponent<mockHex>().realHex = tiles[i][j + width-5];
             }
         }
-        for (int i = 0; i < height/2; i++)
+        for (int i = 0; i < 5; i++)
         {
             for (int j = 0; j < width; j++)
             {
                 GameObject temp = Instantiate(tiles[i][j], new Vector3(tiles[i][j].transform.position.x + 5 * Mathf.Sqrt(3) + maxWidth, tiles[i][j].transform.position.y, tiles[i][j].transform.position.z), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c3";
-                temp = Instantiate(tiles[i + height / 2][j], new Vector3(tiles[i + height / 2][j].transform.position.x - 5 * Mathf.Sqrt(3) - maxWidth, tiles[i + height / 2][j].transform.position.y, tiles[i + height / 2][j].transform.position.z), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
+                temp.GetComponent<hexTile2>().removeScript();
+                temp.AddComponent<mockHex>();
+                temp.GetComponent<mockHex>().realHex = tiles[i][j];
+                temp = Instantiate(tiles[i + height-5][j], new Vector3(tiles[i + height-5][j].transform.position.x - 5 * Mathf.Sqrt(3) - maxWidth, tiles[i + height-5][j].transform.position.y, tiles[i + height-5][j].transform.position.z), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c4";
+                temp.GetComponent<hexTile2>().removeScript();
+                temp.AddComponent<mockHex>();
+                temp.GetComponent<mockHex>().realHex = tiles[i + height - 5][j];
             }
         }
-        for (int i = 0; i < height / 2; i++)
+        for (int i = 0; i < 5; i++)
         {
-            for (int j = 0; j < width/2; j++)
+            for (int j = 0; j < 5; j++)
             {
                 GameObject temp = Instantiate(tiles[i][j], new Vector3(tiles[i][j].transform.position.x + 5 * Mathf.Sqrt(3) + maxWidth, tiles[i][j].transform.position.y, tiles[i][j].transform.position.z + maxHeight + 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c5";
-                temp = Instantiate(tiles[i + height / 2][j], new Vector3(tiles[i + height / 2][j].transform.position.x - 5 * Mathf.Sqrt(3) - maxWidth, tiles[i + height / 2][j].transform.position.y, tiles[i + height / 2][j].transform.position.z + maxHeight + 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
+                temp.GetComponent<hexTile2>().removeScript();
+                temp.AddComponent<mockHex>();
+                temp.GetComponent<mockHex>().realHex = tiles[i][j];
+                temp = Instantiate(tiles[i + height - 5][j], new Vector3(tiles[i + height - 5][j].transform.position.x - 5 * Mathf.Sqrt(3) - maxWidth, tiles[i + height - 5][j].transform.position.y, tiles[i + height - 5][j].transform.position.z + maxHeight + 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c6";
-                temp = Instantiate(tiles[i][j + width / 2], new Vector3(tiles[i][j + width / 2].transform.position.x + 5 * Mathf.Sqrt(3) + maxWidth, tiles[i][j + width / 2].transform.position.y, tiles[i][j + width / 2].transform.position.z - maxHeight - 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
+                temp.GetComponent<hexTile2>().removeScript();
+                temp.AddComponent<mockHex>();
+                temp.GetComponent<mockHex>().realHex = tiles[i+height-5][j];
+                temp = Instantiate(tiles[i][j + width - 5], new Vector3(tiles[i][j + width - 5].transform.position.x + 5 * Mathf.Sqrt(3) + maxWidth, tiles[i][j + width - 5].transform.position.y, tiles[i][j + width - 5].transform.position.z - maxHeight - 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c7";
-                temp = Instantiate(tiles[i + height / 2][j + width / 2], new Vector3(tiles[i + height / 2][j + width / 2].transform.position.x - 5 * Mathf.Sqrt(3) - maxWidth, tiles[i + height / 2][j + width / 2].transform.position.y, tiles[i + height / 2][j + width / 2].transform.position.z - maxHeight - 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
+                temp.GetComponent<hexTile2>().removeScript();
+                temp.AddComponent<mockHex>();
+                temp.GetComponent<mockHex>().realHex = tiles[i][j+width-5];
+                temp = Instantiate(tiles[i + height - 5][j + width - 5], new Vector3(tiles[i + height - 5][j + width - 5].transform.position.x - 5 * Mathf.Sqrt(3) - maxWidth, tiles[i + height - 5][j + width - 5].transform.position.y, tiles[i + height - 5][j + width - 5].transform.position.z - maxHeight - 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c8";
+                temp.GetComponent<hexTile2>().removeScript();
+                temp.AddComponent<mockHex>();
+                temp.GetComponent<mockHex>().realHex = tiles[i+height-5][j+width-5];
             }
         }
     }

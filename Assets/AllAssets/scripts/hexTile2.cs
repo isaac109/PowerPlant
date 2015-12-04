@@ -98,16 +98,9 @@ public class hexTile2 : MonoBehaviour {
             }
             searched = true;
         }
-        if (isMouseOver && Input.GetMouseButtonDown(0) && menuCamera.enabled == false)
+        if (isMouseOver && Input.GetMouseButtonDown(0))
         {
-            menuCamera.enabled = true;
-            mainCamera.rect = new Rect(0f, .5f, 1f, 2f);
-            cameraDistance = mainCamera.gameObject.transform.position.y;
-            mainCamera.GetComponent<cameraControl>().cameraDistance = 20;
-            mainCamera.gameObject.transform.position = new Vector3(this.transform.position.x, 20, this.transform.position.z);
-            this.GetComponent<hexManagement>().show = true;
-            isSelected = true;
-            mainCamera.GetComponent<cameraControl>().canControl = false;
+            zoom();
         }
         if (isSelected)
         {
@@ -117,7 +110,22 @@ public class hexTile2 : MonoBehaviour {
             }
         }
 	}
-
+    public void zoom()
+    {
+        if (mainCamera.GetComponent<cameraControl>().currTile != null)
+        {
+            mainCamera.GetComponent<cameraControl>().currTile.GetComponent<hexManagement>().close();
+        }
+        menuCamera.enabled = true;
+        mainCamera.rect = new Rect(0f, .5f, 1f, 2f);
+        cameraDistance = mainCamera.gameObject.transform.position.y;
+        mainCamera.GetComponent<cameraControl>().cameraDistance = 20;
+        mainCamera.gameObject.transform.position = new Vector3(this.transform.position.x, 20, this.transform.position.z);
+        this.GetComponent<hexManagement>().show = true;
+        isSelected = true;
+        mainCamera.GetComponent<cameraControl>().canControl = false;
+        mainCamera.GetComponent<cameraControl>().currTile = this.gameObject;
+    }
     public void setTerrain(int i)
     {
         isOcean = false;
@@ -243,8 +251,14 @@ public class hexTile2 : MonoBehaviour {
         mainCamera.rect = new Rect(0f, 0f, 1f, 1f);
         this.GetComponent<hexManagement>().show = false;
         isSelected = false;
-        mainCamera.GetComponent<cameraControl>().cameraDistance = cameraDistance;
+        mainCamera.GetComponent<cameraControl>().cameraDistance = mainCamera.GetComponent<cameraControl>().tempCameradistance;
+        //mainCamera.GetComponent<cameraControl>().tempCameradistance = 0;
         mainCamera.GetComponent<cameraControl>().canControl = true;
+        mainCamera.GetComponent<cameraControl>().currTile = null;
         OnMouseExit();
+    }
+    public void removeScript()
+    {
+        Destroy(this);
     }
 }

@@ -21,10 +21,14 @@ public class hexManagement : MonoBehaviour {
             GUILayout.BeginVertical();
             if (GUI.Button(new Rect(0, 0, 50, 50), "Close"))
             {
-                this.GetComponent<hexTile2>().closeCameras();
+                close();
             }
             GUILayout.EndVertical();
             GUILayout.EndArea();
         }
+    }
+    public void close()
+    {
+        this.GetComponent<hexTile2>().closeCameras();
     }
 }

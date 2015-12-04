@@ -11,11 +11,14 @@ public class cameraControl : MonoBehaviour {
     float cameraWidthMax = 0;
     float cameraHeightMax = 0;
     public float cameraDistance = 100f;
+    public float tempCameradistance = 0f;
     float scrollSpeed = 100f;
 
     public bool canControl = true;
 
     public gridManager gm;
+
+    public GameObject currTile = null;
 
 	// Use this for initialization
 	void Start () {
@@ -42,25 +45,30 @@ public class cameraControl : MonoBehaviour {
             cameraDistance = Mathf.Clamp(cameraDistance, cameraDistanceMin, cameraDistanceMax);
             this.transform.position = new Vector3(this.transform.position.x, cameraDistance, this.transform.position.z);
             cameraBounds();
+            tempCameradistance = cameraDistance;
+            cameraWidthMax = (cameraDistance / cameraDistanceMax) * gm.maxWidth / 2;
+            cameraHeightMax = (cameraDistance / cameraDistanceMax) * gm.maxHeight / 2;
+            Debug.Log(cameraWidthMax.ToString());
+            if (this.transform.position.x <= cameraWidthMax)
+            {
+                // Debug.Log("here");
+                this.transform.position = new Vector3(cameraWidthMax, this.transform.position.y, this.transform.position.z);
+                //Debug.Log("here2" + (gm.maxWidth - cameraWidthMax).ToString());
+            }
+            if (this.transform.position.x > gm.maxWidth - cameraWidthMax)
+            {
+                this.transform.position = new Vector3(gm.maxWidth - cameraWidthMax, this.transform.position.y, this.transform.position.z);
+            }
+            if (this.transform.position.z < cameraHeightMax)
+            {
+                this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, cameraHeightMax);
+            }
+            if (this.transform.position.z > gm.maxHeight - cameraHeightMax)
+            {
+                this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, gm.maxHeight - cameraHeightMax);
+            }
         }
-        cameraWidthMax = (cameraDistance / cameraDistanceMax) * gm.maxWidth/2;
-        cameraHeightMax = (cameraDistance / cameraDistanceMax) * gm.maxHeight / 2;
-        if (this.transform.position.x < cameraWidthMax)
-        {
-            this.transform.position = new Vector3(cameraWidthMax, this.transform.position.y, this.transform.position.z);
-        }
-        if (this.transform.position.x > gm.maxWidth - cameraWidthMax)
-        {
-            this.transform.position = new Vector3(gm.maxWidth - cameraWidthMax, this.transform.position.y, this.transform.position.z);
-        }
-        if (this.transform.position.z < cameraHeightMax)
-        {
-            this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, cameraHeightMax);
-        }
-        if (this.transform.position.z > gm.maxHeight - cameraHeightMax)
-        {
-            this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, gm.maxHeight - cameraHeightMax);
-        }
+        
 	}
 
     void cameraBounds()
