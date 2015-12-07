@@ -32,6 +32,8 @@ public class gridManager : MonoBehaviour {
 
     public float maxHeight = 0;
     public float maxWidth = 0;
+    public float cMaxHeight = 0;
+    public float cMaxWidth = 0;
 	// Use this for initialization
 	void Start () {
         int newPercentLand = (int)((float)(height * width) * percentLand);
@@ -72,6 +74,8 @@ public class gridManager : MonoBehaviour {
         cityNum = (int)((float)(height * width)*(float)(percentCity));
         Debug.Log("cityNum " + cityNum.ToString());
         cwidth = width;
+        cMaxHeight = maxHeight;
+        cMaxWidth = maxWidth;
         done = true;
 	}
 
@@ -80,7 +84,7 @@ public class gridManager : MonoBehaviour {
     {
         if (tiles[height - 1][width - 1].GetComponent<hexTile2>().searched && !landCreated)
         {
-            establishBorderNeighbors();
+            //establishBorderNeighbors();
             createOcean();
             landCreated = true;
             createLand();
@@ -177,14 +181,10 @@ public class gridManager : MonoBehaviour {
             {
                 GameObject temp = Instantiate(tiles[i][j], new Vector3(tiles[i][j].transform.position.x, tiles[i][j].transform.position.y, tiles[i][j].transform.position.z + maxHeight + 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c1";
-                temp.GetComponent<hexTile2>().removeScript();
-                temp.AddComponent<mockHex>();
-                temp.GetComponent<mockHex>().realHex = tiles[i][j];
+                temp.GetComponent<hexTile2>().setBorder();
                 temp = Instantiate(tiles[i][j + width-5], new Vector3(tiles[i][j + width-5].transform.position.x, tiles[i][j + width-5].transform.position.y, tiles[i][j + width-5].transform.position.z - maxHeight - 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c2";
-                temp.GetComponent<hexTile2>().removeScript();
-                temp.AddComponent<mockHex>();
-                temp.GetComponent<mockHex>().realHex = tiles[i][j + width-5];
+                temp.GetComponent<hexTile2>().setBorder();
             }
         }
         for (int i = 0; i < 5; i++)
@@ -193,14 +193,10 @@ public class gridManager : MonoBehaviour {
             {
                 GameObject temp = Instantiate(tiles[i][j], new Vector3(tiles[i][j].transform.position.x + 5 * Mathf.Sqrt(3) + maxWidth, tiles[i][j].transform.position.y, tiles[i][j].transform.position.z), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c3";
-                temp.GetComponent<hexTile2>().removeScript();
-                temp.AddComponent<mockHex>();
-                temp.GetComponent<mockHex>().realHex = tiles[i][j];
+                temp.GetComponent<hexTile2>().setBorder();
                 temp = Instantiate(tiles[i + height-5][j], new Vector3(tiles[i + height-5][j].transform.position.x - 5 * Mathf.Sqrt(3) - maxWidth, tiles[i + height-5][j].transform.position.y, tiles[i + height-5][j].transform.position.z), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c4";
-                temp.GetComponent<hexTile2>().removeScript();
-                temp.AddComponent<mockHex>();
-                temp.GetComponent<mockHex>().realHex = tiles[i + height - 5][j];
+                temp.GetComponent<hexTile2>().setBorder();
             }
         }
         for (int i = 0; i < 5; i++)
@@ -209,24 +205,16 @@ public class gridManager : MonoBehaviour {
             {
                 GameObject temp = Instantiate(tiles[i][j], new Vector3(tiles[i][j].transform.position.x + 5 * Mathf.Sqrt(3) + maxWidth, tiles[i][j].transform.position.y, tiles[i][j].transform.position.z + maxHeight + 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c5";
-                temp.GetComponent<hexTile2>().removeScript();
-                temp.AddComponent<mockHex>();
-                temp.GetComponent<mockHex>().realHex = tiles[i][j];
+                temp.GetComponent<hexTile2>().setBorder();
                 temp = Instantiate(tiles[i + height - 5][j], new Vector3(tiles[i + height - 5][j].transform.position.x - 5 * Mathf.Sqrt(3) - maxWidth, tiles[i + height - 5][j].transform.position.y, tiles[i + height - 5][j].transform.position.z + maxHeight + 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c6";
-                temp.GetComponent<hexTile2>().removeScript();
-                temp.AddComponent<mockHex>();
-                temp.GetComponent<mockHex>().realHex = tiles[i+height-5][j];
+                temp.GetComponent<hexTile2>().setBorder();
                 temp = Instantiate(tiles[i][j + width - 5], new Vector3(tiles[i][j + width - 5].transform.position.x + 5 * Mathf.Sqrt(3) + maxWidth, tiles[i][j + width - 5].transform.position.y, tiles[i][j + width - 5].transform.position.z - maxHeight - 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c7";
-                temp.GetComponent<hexTile2>().removeScript();
-                temp.AddComponent<mockHex>();
-                temp.GetComponent<mockHex>().realHex = tiles[i][j+width-5];
+                temp.GetComponent<hexTile2>().setBorder();
                 temp = Instantiate(tiles[i + height - 5][j + width - 5], new Vector3(tiles[i + height - 5][j + width - 5].transform.position.x - 5 * Mathf.Sqrt(3) - maxWidth, tiles[i + height - 5][j + width - 5].transform.position.y, tiles[i + height - 5][j + width - 5].transform.position.z - maxHeight - 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c8";
-                temp.GetComponent<hexTile2>().removeScript();
-                temp.AddComponent<mockHex>();
-                temp.GetComponent<mockHex>().realHex = tiles[i+height-5][j+width-5];
+                temp.GetComponent<hexTile2>().setBorder();
             }
         }
     }

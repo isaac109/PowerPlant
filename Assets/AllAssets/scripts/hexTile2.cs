@@ -35,6 +35,8 @@ public class hexTile2 : MonoBehaviour {
     public Material earthQuake;
     public Material river;
 
+    public Material border;
+
     public Material city;
 
     public bool isOcean = false;
@@ -177,6 +179,13 @@ public class hexTile2 : MonoBehaviour {
                 break;
         }
     }
+
+    public void setBorder()
+    {
+        this.gameObject.GetComponent<Renderer>().material = border;
+        Destroy(this);
+    }
+
     public void setModifier(int i)
     {
         hasVolcano = false;
