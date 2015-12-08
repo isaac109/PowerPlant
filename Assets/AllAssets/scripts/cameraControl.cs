@@ -26,7 +26,7 @@ public class cameraControl : MonoBehaviour {
         {
         }
         this.transform.position = new Vector3(gm.cMaxWidth/2, this.transform.position.y, gm.cMaxHeight/2);
-        cameraDistanceMax = (float)gm.cwidth * (8f+(2.0f/3.0f));
+        cameraDistanceMax = (float)gm.cwidth * (8f+(2.0f/3.0f)) + 5;
         cameraDistance = cameraDistanceMax;
 	
 	}
@@ -69,21 +69,26 @@ public class cameraControl : MonoBehaviour {
             tempCameradistance = cameraDistance;
             cameraWidthMax = (cameraDistance / cameraDistanceMax) * gm.cMaxWidth / 2;
             cameraHeightMax = (cameraDistance / cameraDistanceMax) * gm.cMaxHeight / 2;
-            if (this.transform.position.x <= cameraWidthMax)
+            float cBorderPercent = 0;
+            if ((cameraDistance / cameraDistanceMax) != 1)
             {
-                this.transform.position = new Vector3(cameraWidthMax, this.transform.position.y, this.transform.position.z);
+                cBorderPercent = ((100f - ((cameraDistance / cameraDistanceMax) * 100)) / 100) * 6;
+            } 
+            if (this.transform.position.x <= cameraWidthMax - cBorderPercent)
+            {
+                this.transform.position = new Vector3(cameraWidthMax - cBorderPercent, this.transform.position.y, this.transform.position.z);
             }
-            if (this.transform.position.x > gm.cMaxWidth - cameraWidthMax)
+            if (this.transform.position.x > gm.cMaxWidth - cameraWidthMax + cBorderPercent)
             {
-                this.transform.position = new Vector3(gm.cMaxWidth - cameraWidthMax, this.transform.position.y, this.transform.position.z);
+                this.transform.position = new Vector3(gm.cMaxWidth - cameraWidthMax+5, this.transform.position.y, this.transform.position.z);
             }
-            if (this.transform.position.z < cameraHeightMax)
+            if (this.transform.position.z < cameraHeightMax - cBorderPercent)
             {
-                this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, cameraHeightMax);
+                this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, cameraHeightMax-cBorderPercent);
             }
-            if (this.transform.position.z > gm.cMaxHeight - cameraHeightMax)
+            if (this.transform.position.z > gm.cMaxHeight - cameraHeightMax + cBorderPercent)
             {
-                this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, gm.cMaxHeight - cameraHeightMax);
+                this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, gm.cMaxHeight - cameraHeightMax + cBorderPercent);
             }
         }
         
