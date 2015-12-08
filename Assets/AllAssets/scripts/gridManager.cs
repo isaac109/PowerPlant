@@ -149,7 +149,7 @@ public class gridManager : MonoBehaviour {
                         {
                             tiles[i][j].GetComponent<hexTile2>().setModifier(mod);
                         }
-                        if (mod == 5 && tiles[i][j].GetComponent<hexTile2>().isPlains)
+                        if (mod == 5 && tiles[i][j].GetComponent<hexTile2>().isHills)
                         {
                             tiles[i][j].GetComponent<hexTile2>().setModifier(mod);
                         }
