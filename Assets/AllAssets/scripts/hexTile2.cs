@@ -41,30 +41,39 @@ public class hexTile2 : MonoBehaviour {
 
     public bool isOcean = false;
     public bool isLand = false;
-    public bool isMountain = false;
-    public bool isDesert = false;
-    public bool isPlains = false;
-    public bool isValley = false;
-    public bool isHills = false;
-    public bool isMarshes = false;
-    public bool isForest = false;
-    public bool isTundra = false;
+    //isMountain, isDesert, isPlains, isValley, isHills, isMarshes, isForest, isTundra
+    public bool[] biomeTypes = { false, false, false, false, false, false, false, false };
+    //hasVolcano, hasHighWinds, hasDenseTrees, hasHotSpot, hasCoal, hasNaturalGas, hasEarthQuake, hasRiver
+    public bool[] modifierTypes = { false, false, false, false, false, false, false, false };
+
+
+    //public bool isMountain = false;
+    //public bool isDesert = false;
+    //public bool isPlains = false;
+    //public bool isValley = false;
+    //public bool isHills = false;
+    //public bool isMarshes = false;
+    //public bool isForest = false;
+    //public bool isTundra = false;
+    
     public bool isCoast = false;
+    public bool hasCity = false;
 
     public bool isChecked = false;
     public bool isMouseOver = false;
     public bool isSelected = false;
 
-    public bool hasVolcano = false;
-    public bool hasHighWinds = false;
-    public bool hasDenseTrees = false;
-    public bool hasHotSpot = false;
-    public bool hasCoal = false;
-    public bool hasNarutalGas = false;
-    public bool hasEarthQuake = false;
-    public bool hasRiver = false;
+    
+    //public bool hasVolcano = false;
+    //public bool hasHighWinds = false;
+    //public bool hasDenseTrees = false;
+    //public bool hasHotSpot = false;
+    //public bool hasCoal = false;
+    //public bool hasNarutalGas = false;
+    //public bool hasEarthQuake = false;
+    //public bool hasRiver = false;
 
-    public bool hasCity = false;
+    
     
     public Camera mainCamera;
     public Camera menuCamera;
@@ -131,14 +140,18 @@ public class hexTile2 : MonoBehaviour {
     public void setTerrain(int i)
     {
         isOcean = false;
-        isMountain = false;
-        isDesert = false;
-        isPlains = false;
-        isValley = false;
-        isHills = false;
-        isMarshes = false;
-        isForest = false;
-        isTundra = false;
+        for (int j = 0; j < biomeTypes.Length; j++)
+        {
+            biomeTypes[j] = false;
+        }
+        //isMountain = false;
+        //isDesert = false;
+        //isPlains = false;
+        //isValley = false;
+        //isHills = false;
+        //isMarshes = false;
+        //isForest = false;
+        //isTundra = false;
         switch (i)
         {
             case 1:
@@ -147,35 +160,35 @@ public class hexTile2 : MonoBehaviour {
                 break;
             case 2:
                 this.GetComponent<Renderer>().material = mountain;
-                isMountain = true;
+                biomeTypes[0] = true;
                 break;
             case 3:
                 this.GetComponent<Renderer>().material = desert;
-                isDesert = true;
+                biomeTypes[1] = true;
                 break;
             case 4:
                 this.GetComponent<Renderer>().material = plains;
-                isPlains = true;
+                biomeTypes[2] = true;
                 break;
             case 5:
                 this.GetComponent<Renderer>().material = valley;
-                isValley = true;
+                biomeTypes[3] = true;
                 break;
             case 6:
                 this.GetComponent<Renderer>().material = hills;
-                isHills = true;
+                biomeTypes[4] = true;
                 break;
             case 7:
                 this.GetComponent<Renderer>().material = marsh;
-                isMarshes = true;
+                biomeTypes[5] = true;
                 break;
             case 8:
                 this.GetComponent<Renderer>().material = forest;
-                isForest = true;
+                biomeTypes[6] = true;
                 break;
             case 9:
                 this.GetComponent<Renderer>().material = tundra;
-                isTundra = true;
+                biomeTypes[7] = true;
                 break;
         }
     }
@@ -188,47 +201,51 @@ public class hexTile2 : MonoBehaviour {
 
     public void setModifier(int i)
     {
-        hasVolcano = false;
-        hasHotSpot = false;
-        hasHighWinds = false;
-        hasRiver = false;
-        hasEarthQuake = false;
-        hasNarutalGas = false;
-        hasDenseTrees = false;
-        hasCoal = false;
+        for (int j = 0; j < modifierTypes.Length; j++)
+        {
+            modifierTypes[j] = false;
+        }
+        //hasVolcano = false;
+        //hasHotSpot = false;
+        //hasHighWinds = false;
+        //hasRiver = false;
+        //hasEarthQuake = false;
+        //hasNarutalGas = false;
+        //hasDenseTrees = false;
+        //hasCoal = false;
         switch (i)
         {
             case 1:
                 this.GetComponent<Renderer>().material = volcano;
-                hasVolcano = true;
+                modifierTypes[0] = true;
                 break;
             case 2:
                 this.GetComponent<Renderer>().material = hotSpot;
-                hasHotSpot = true;
+                modifierTypes[1] = true;
                 break;
             case 3:
                 this.GetComponent<Renderer>().material = highWind;
-                hasHighWinds = true;
+                modifierTypes[2] = true;
                 break;
             case 4:
                 this.GetComponent<Renderer>().material = river;
-                hasRiver = true;
+                modifierTypes[3] = true;
                 break;
             case 5:
                 this.GetComponent<Renderer>().material = earthQuake;
-                hasEarthQuake = true;
+                modifierTypes[4] = true;
                 break;
             case 6:
                 this.GetComponent<Renderer>().material = naturalGas;
-                hasNarutalGas = true;
+                modifierTypes[5] = true;
                 break;
             case 7:
                 this.GetComponent<Renderer>().material = denseTrees;
-                hasDenseTrees = true;
+                modifierTypes[6] = true;
                 break;
             case 8:
                 this.GetComponent<Renderer>().material = coal;
-                hasCoal = true;
+                modifierTypes[7] = true;
                 break;
         }
     }

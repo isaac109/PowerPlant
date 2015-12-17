@@ -21,14 +21,7 @@ public class gridManager : MonoBehaviour {
     bool landCreated = false;
 
     int tileBiomeNum = 0;
-    int mountainNum = 0;
-    int desertNum = 0;
-    int plainsNum = 0;
-    int valleyNum = 0;
-    int hillsNum = 0;
-    int marshNum = 0;
-    int forestNum = 0;
-    int tundraNum = 0;
+    int[] biomeNums = new int[8];//mountain, desert, plains, valley, hills,marsh,forest,tundra
 
     public float maxHeight = 0;
     public float maxWidth = 0;
@@ -36,6 +29,10 @@ public class gridManager : MonoBehaviour {
     public float cMaxWidth = 0;
 	// Use this for initialization
 	void Start () {
+        foreach (int i in biomeNums)
+        {
+            biomeNums[i] = 0;
+        }
         int newPercentLand = (int)((float)(height * width) * percentLand);
         Debug.Log("land" + percentLand);
         land = new GameObject[(int)newPercentLand];
@@ -85,11 +82,10 @@ public class gridManager : MonoBehaviour {
         if (tiles[height - 1][width - 1].GetComponent<hexTile2>().searched && !landCreated)
         {
             //establishBorderNeighbors();
-            createOcean();
+            generateContinents();
             landCreated = true;
-            createLand();
-            clearIslands();
-            setCostal();
+            createBiomes();
+            clearIslandsSetCoasts();
             setModifiers();
             setCitys();
             createExtraMaps();
@@ -101,12 +97,13 @@ public class gridManager : MonoBehaviour {
         {
             for (int j = 0; j < width; j++)
             {
-                if (!tiles[i][j].GetComponent<hexTile2>().hasCity && cityCounter < cityNum && !tiles[i][j].GetComponent<hexTile2>().isOcean)
+                hexTile2 temp = tiles[i][j].GetComponent<hexTile2>();
+                if (!temp.hasCity && cityCounter < cityNum && !temp.isOcean)
                 {
                     int r = Random.Range(0, 99);
                     if (r <= percentCity*100)
                     {
-                        tiles[i][j].GetComponent<hexTile2>().setCity();
+                        temp.setCity();
                         cityCounter++;
                     }
                 }
@@ -123,47 +120,48 @@ public class gridManager : MonoBehaviour {
         {
             for (int j = 0; j < width; j++)
             { 
-                if (!tiles[i][j].GetComponent<hexTile2>().isOcean)
+                hexTile2 temp = tiles[i][j].GetComponent<hexTile2>();
+                if (!temp.isOcean)
                 {
                     int mod = Random.Range(1, 9);
                     int r = Random.Range(0, 100);
                     if (r <= percentModifier)
                     {
-                        tiles[i][j].GetComponent<hexTile2>().setModifier(mod);
+                        temp.setModifier(mod);
                     }
                     else if (r <= 3 * percentModifier)
                     {
-                        if (mod == 1 && tiles[i][j].GetComponent<hexTile2>().isMountain)
+                        if (mod == 1 && temp.modifierTypes[mod - 1])
                         {
-                            tiles[i][j].GetComponent<hexTile2>().setModifier(mod);
+                            temp.setModifier(mod);
                         }
-                        if (mod == 2 && tiles[i][j].GetComponent<hexTile2>().isDesert)
+                        if (mod == 2 && temp.modifierTypes[mod - 1])
                         {
-                            tiles[i][j].GetComponent<hexTile2>().setModifier(mod);
+                            temp.setModifier(mod);
                         }
-                        if (mod == 3 && tiles[i][j].GetComponent<hexTile2>().isPlains)
+                        if (mod == 3 && temp.modifierTypes[mod - 1])
                         {
-                            tiles[i][j].GetComponent<hexTile2>().setModifier(mod);
+                            temp.setModifier(mod);
                         }
-                        if (mod == 4 && tiles[i][j].GetComponent<hexTile2>().isValley)
+                        if (mod == 4 && temp.modifierTypes[mod - 1])
                         {
-                            tiles[i][j].GetComponent<hexTile2>().setModifier(mod);
+                            temp.setModifier(mod);
                         }
-                        if (mod == 5 && tiles[i][j].GetComponent<hexTile2>().isHills)
+                        if (mod == 5 && temp.modifierTypes[mod - 1])
                         {
-                            tiles[i][j].GetComponent<hexTile2>().setModifier(mod);
+                            temp.setModifier(mod);
                         }
-                        if (mod == 6 && tiles[i][j].GetComponent<hexTile2>().isMarshes)
+                        if (mod == 6 && temp.modifierTypes[mod - 1])
                         {
-                            tiles[i][j].GetComponent<hexTile2>().setModifier(mod);
+                            temp.setModifier(mod);
                         }
-                        if (mod == 7 && tiles[i][j].GetComponent<hexTile2>().isForest)
+                        if (mod == 7 && temp.modifierTypes[mod - 1])
                         {
-                            tiles[i][j].GetComponent<hexTile2>().setModifier(mod);
+                            temp.setModifier(mod);
                         }
-                        if (mod == 8 && tiles[i][j].GetComponent<hexTile2>().isTundra)
+                        if (mod == 8 && temp.modifierTypes[mod - 1])
                         {
-                            tiles[i][j].GetComponent<hexTile2>().setModifier(mod);
+                            temp.setModifier(mod);
                         }
                     }
                 }
@@ -218,7 +216,7 @@ public class gridManager : MonoBehaviour {
             }
         }
     }
-    void establishBorderNeighbors()
+    /*void establishBorderNeighbors()
     {
         for(int i=0; i < height; i++)
         {
@@ -277,39 +275,31 @@ public class gridManager : MonoBehaviour {
                 tiles[i][j].GetComponent<hexTile2>().counter = 6;
             }
         }
-    }
-    void setCostal()
+    }*/
+    void setIfCoast(GameObject tile)
     {
-        for (int i = 0; i < height; i++)
+        hexTile2 temp = tile.GetComponent<hexTile2>();
+        for (int i = 0; i < temp.counter; i++)
         {
-            for (int j = 0; j < width; j++)
+            if (temp.neighbors[i].GetComponent<hexTile2>().isOcean && !temp.isOcean)
             {
-                checkIfCoast(tiles[i][j]);
-            }
-        }
-    }
-    void checkIfCoast(GameObject tile)
-    {
-        for (int i = 0; i < tile.GetComponent<hexTile2>().counter; i++)
-        {
-            if (tile.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isOcean && !tile.GetComponent<hexTile2>().isOcean)
-            {
-                tile.GetComponent<hexTile2>().isCoast = true;
+                temp.isCoast = true;
                 break;
             }
         }
     }
-    void clearIslands()
+    void clearIslandsSetCoasts()
     {
         for (int i = 0; i < height; i++)
         {
             for (int j = 0; j < width; j++)
             {
-                checkIfIsland(tiles[i][j]);
+                changeIfIsland(tiles[i][j]);
+                setIfCoast(tiles[i][j]);
             }
         }
     }
-    void checkIfIsland(GameObject tile)
+    void changeIfIsland(GameObject tile)
     {
         int numOfMou = 0;
         int numOfDes = 0;
@@ -319,82 +309,83 @@ public class gridManager : MonoBehaviour {
         int numOfMar = 0;
         int numOfFor = 0;
         int numOfTun = 0;
-        for (int i = 0; i < tile.GetComponent<hexTile2>().counter; i++)
+        hexTile2 temp = tile.GetComponent<hexTile2>();
+        for (int i = 0; i < temp.counter; i++)
         {
-            if (tile.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isMountain)
+            if (temp.neighbors[i].GetComponent<hexTile2>().biomeTypes[0])
             {
                 numOfMou++;
             }
-            if (tile.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isDesert)
+            if (temp.neighbors[i].GetComponent<hexTile2>().biomeTypes[1])
             {
                 numOfDes++;
             }
-            if (tile.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isPlains)
+            if (temp.neighbors[i].GetComponent<hexTile2>().biomeTypes[2])
             {
                 numOfPla++;
             }
-            if (tile.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isValley)
+            if (temp.neighbors[i].GetComponent<hexTile2>().biomeTypes[3])
             {
                 numOfVal++;
             }
-            if (tile.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isHills)
+            if (temp.neighbors[i].GetComponent<hexTile2>().biomeTypes[4])
             {
                 numOfHil++;
             }
-            if (tile.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isMarshes)
+            if (temp.neighbors[i].GetComponent<hexTile2>().biomeTypes[5])
             {
                 numOfMar++;
             }
-            if (tile.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isForest)
+            if (temp.neighbors[i].GetComponent<hexTile2>().biomeTypes[6])
             {
                 numOfFor++;
             }
-            if (tile.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isTundra)
+            if (temp.neighbors[i].GetComponent<hexTile2>().biomeTypes[7])
             {
                 numOfTun++;
             }
         }
-        if ((tile.GetComponent<hexTile2>().isMountain && numOfMou == 0) ||
-            (tile.GetComponent<hexTile2>().isDesert && numOfDes == 0) ||
-            (tile.GetComponent<hexTile2>().isPlains && numOfPla == 0) ||
-            (tile.GetComponent<hexTile2>().isValley && numOfVal == 0) ||
-            (tile.GetComponent<hexTile2>().isHills && numOfHil == 0) ||
-            (tile.GetComponent<hexTile2>().isMarshes && numOfMar == 0) ||
-            (tile.GetComponent<hexTile2>().isForest && numOfFor == 0) ||
-            (tile.GetComponent<hexTile2>().isTundra && numOfTun == 0))
+        if ((temp.biomeTypes[0] && numOfMou == 0) ||
+            (temp.biomeTypes[1] && numOfDes == 0) ||
+            (temp.biomeTypes[2] && numOfPla == 0) ||
+            (temp.biomeTypes[3] && numOfVal == 0) ||
+            (temp.biomeTypes[4] && numOfHil == 0) ||
+            (temp.biomeTypes[5] && numOfMar == 0) ||
+            (temp.biomeTypes[6] && numOfFor == 0) ||
+            (temp.biomeTypes[7] && numOfTun == 0))
         {
             int num = Random.Range(1,(numOfMou+numOfDes+numOfPla+numOfVal+numOfHil+numOfMar+numOfFor+numOfTun+1));
             if (num <= numOfMou)
             {
-                tile.GetComponent<hexTile2>().setTerrain(2);
+                temp.setTerrain(2);
             }
             else if (num <= numOfDes + numOfMou)
             {
-                tile.GetComponent<hexTile2>().setTerrain(3);
+                temp.setTerrain(3);
             }
             else if (num <= numOfPla + numOfDes + numOfMou)
             {
-                tile.GetComponent<hexTile2>().setTerrain(4);
+                temp.setTerrain(4);
             }
             else if (num <= numOfVal + numOfPla + numOfDes + numOfMou)
             {
-                tile.GetComponent<hexTile2>().setTerrain(5);
+                temp.setTerrain(5);
             }
             else if (num <= numOfHil + numOfVal + numOfPla + numOfDes + numOfMou)
             {
-                tile.GetComponent<hexTile2>().setTerrain(6);
+                temp.setTerrain(6);
             }
             else if (num <= numOfMar + numOfHil + numOfVal + numOfPla + numOfDes + numOfMou)
             {
-                tile.GetComponent<hexTile2>().setTerrain(7);
+                temp.setTerrain(7);
             }
             else if (num <= numOfFor + numOfMar + numOfHil + numOfVal + numOfPla + numOfDes + numOfMou)
             {
-                tile.GetComponent<hexTile2>().setTerrain(8);
+                temp.setTerrain(8);
             }
             else if (num <= numOfTun + numOfFor + numOfMar + numOfHil + numOfVal + numOfPla + numOfDes + numOfMou)
             {
-                tile.GetComponent<hexTile2>().setTerrain(9);
+                temp.setTerrain(9);
             }
             else
             {
@@ -402,143 +393,145 @@ public class gridManager : MonoBehaviour {
             }
         }
     }
-    void createLand()
+    void createBiomes()
     {
         float percentBiome = .125f;
-        tileBiomeNum = (int)((float)landCounter * percentBiome)+100;
+        tileBiomeNum = (int)(((float)landCounter * percentBiome)+(height*width*percentBiome*percentLand*.4f));
         Debug.Log( " num " + tileBiomeNum);
         for (int i = 0; i < height; i++)
         {
             for (int j = 0; j < width; j++)
             {
-                if (!tiles[i][j].GetComponent<hexTile2>().isChecked && !tiles[i][j].GetComponent<hexTile2>().isOcean)
+                hexTile2 temp = tiles[i][j].GetComponent<hexTile2>();
+                if (!temp.isChecked && !temp.isOcean)
                 {
-                    generateBiome(tiles[i][j]);
+                    selectBiome(tiles[i][j]);
                 }
             }
         }
     }
-    void generateBiomeAlt(GameObject start)
+    void selectBiomeAlt(GameObject start)
     {
-        if (mountainNum != tileBiomeNum)
+        if (biomeNums[0] != tileBiomeNum)
         {
-            genMou(start);
+            genBiome(start, 0);
         }
-        else if (desertNum != tileBiomeNum)
+        else if (biomeNums[1] != tileBiomeNum)
         {
-            genDes(start);
+            genBiome(start, 1);
         }
-        else if (plainsNum != tileBiomeNum)
+        else if (biomeNums[2] != tileBiomeNum)
         {
-            genPla(start);
+            genBiome(start, 2);
         }
-        else if (valleyNum != tileBiomeNum)
+        else if (biomeNums[3] != tileBiomeNum)
         {
-            genVal(start);
+            genBiome(start, 3);
         }
-        else if (hillsNum != tileBiomeNum)
+        else if (biomeNums[4] != tileBiomeNum)
         {
-            genHi(start);
+            genBiome(start, 4);
         }
-        else if (marshNum != tileBiomeNum)
+        else if (biomeNums[5] != tileBiomeNum)
         {
-            genMar(start);
+            genBiome(start, 5);
         }
-        else if (forestNum != tileBiomeNum)
+        else if (biomeNums[6] != tileBiomeNum)
         {
-            genFor(start);
+            genBiome(start, 6);
         }
-        else if (tundraNum != tileBiomeNum)
+        else if (biomeNums[7] != tileBiomeNum)
         {
-            genTun(start);
+            genBiome(start, 7);
         }
        
 
     }
-    void generateBiome(GameObject start)
+    void selectBiome(GameObject start)
     {
 
         int biome = Random.Range(0, 8);
         switch (biome)
         {
             case 0:
-                if (mountainNum >= tileBiomeNum)
+                if (biomeNums[0] >= tileBiomeNum)
                 {
-                    generateBiomeAlt(start);
+                    selectBiomeAlt(start);
                     break;
                 }
-                genMou(start);
+                genBiome(start, 0);
                 break;
             case 1:
-                if (desertNum >= tileBiomeNum)
+                if (biomeNums[1] >= tileBiomeNum)
                 {
-                    generateBiomeAlt(start);
+                    selectBiomeAlt(start);
                     break;
                 }
-                genDes(start);
+                genBiome(start, 1);
                 break;
             case 2:
-                if (plainsNum >= tileBiomeNum)
+                if (biomeNums[2] >= tileBiomeNum)
                 {
-                    generateBiomeAlt(start);
+                    selectBiomeAlt(start);
                     break;
                 }
-                genPla(start);
+                genBiome(start, 2);
                 break;
             case 3:
-                if (valleyNum >= tileBiomeNum)
+                if (biomeNums[3] >= tileBiomeNum)
                 {
-                    generateBiomeAlt(start);
+                    selectBiomeAlt(start);
                     break;
                 }
-                genVal(start);
+                genBiome(start, 3);
                 break;
             case 4:
-                if (hillsNum >= tileBiomeNum)
+                if (biomeNums[4] >= tileBiomeNum)
                 {
-                    generateBiomeAlt(start);
+                    selectBiomeAlt(start);
                     break;
                 }
-                genHi(start);
+                genBiome(start, 4);
                 break;
             case 5:
-                if (marshNum >= tileBiomeNum)
+                if (biomeNums[5] >= tileBiomeNum)
                 {
-                    generateBiomeAlt(start); 
+                    selectBiomeAlt(start); 
                     break;
                 }
-                genMar(start);
+                genBiome(start, 5);
                 break;
             case 6:
-                if (forestNum >= tileBiomeNum)
+                if (biomeNums[6] >= tileBiomeNum)
                 {
-                    generateBiomeAlt(start);
+                    selectBiomeAlt(start);
                     break;
                 }
-                genFor(start);
+                genBiome(start, 6);
                 break;
             case 7:
-                if (tundraNum >= tileBiomeNum)
+                if (biomeNums[7] >= tileBiomeNum)
                 {
-                    generateBiomeAlt(start);
+                    selectBiomeAlt(start);
                     break;
                 }
-                genTun(start);
+                genBiome(start, 7);
                 break;
         }
     }
-    void genMou(GameObject start)
+    void genBiome(GameObject start, int biome)
     {
-        start.GetComponent<hexTile2>().setTerrain(2);
-        mountainNum++;
-        start.GetComponent<hexTile2>().isChecked = true;
+        hexTile2 temp = start.GetComponent<hexTile2>();
+        temp.setTerrain(biome + 2);
+        biomeNums[biome]++;
+        temp.isChecked = true;
         GameObject[] acceptableNeighbors = new GameObject[6];
         int neighborNum = 0;
-        for(int i = 0; i < start.GetComponent<hexTile2>().counter; i++)
+        for(int i = 0; i < temp.counter; i++)
         {
-            if(!start.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isChecked && !start.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isOcean)
+            if(!temp.neighbors[i].GetComponent<hexTile2>().isChecked && !temp.neighbors[i].GetComponent<hexTile2>().isOcean)
             {
-                acceptableNeighbors[neighborNum] = start.GetComponent<hexTile2>().neighbors[i];
+                acceptableNeighbors[neighborNum] = temp.neighbors[i];
                 neighborNum ++;
             }
         }
@@ -559,309 +552,23 @@ public class gridManager : MonoBehaviour {
                     neighbor = Random.Range(0, neighborNum);
                 }
                 selectedNeighbors[neighbor] = true;
-                if (mountainNum == tileBiomeNum)
+                if (biomeNums[biome] == tileBiomeNum)
                 {
-                    generateBiome(acceptableNeighbors[neighbor]);
+                    selectBiome(acceptableNeighbors[neighbor]);
                     break;
                 }
-                genMou(acceptableNeighbors[neighbor]);
+                genBiome(acceptableNeighbors[neighbor], biome);
             }
         }
     }
-    void genDes(GameObject start)
-    {
-        start.GetComponent<hexTile2>().setTerrain(3);
-        desertNum++;
-        start.GetComponent<hexTile2>().isChecked = true;
-        GameObject[] acceptableNeighbors = new GameObject[6];
-        int neighborNum = 0;
-        for (int i = 0; i < start.GetComponent<hexTile2>().counter; i++)
-        {
-            if (!start.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isChecked && !start.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isOcean)
-            {
-                acceptableNeighbors[neighborNum] = start.GetComponent<hexTile2>().neighbors[i];
-                neighborNum++;
-            }
-        }
-        int numTurning = Random.Range(0, neighborNum);
-        if (numTurning != 0)
-        {
-            bool[] selectedNeighbors = new bool[6];
-            for (int k = 0; k < 6; k++)
-            {
-                selectedNeighbors[k] = false;
-            }
-            for (int i = 0; i < numTurning; i++)
-            {
-                int neighbor = 0;
-                neighbor = Random.Range(0, neighborNum);
-                while (selectedNeighbors[neighbor] == true)
-                {
-                    neighbor = Random.Range(0, neighborNum);
-                }
-                selectedNeighbors[neighbor] = true;
-                if (desertNum == tileBiomeNum)
-                {
-                    generateBiome(acceptableNeighbors[neighbor]);
-                    break;
-                }
-                genDes(acceptableNeighbors[neighbor]);
-            }
-        }
-    }
-    void genPla(GameObject start)
-    {
-        start.GetComponent<hexTile2>().setTerrain(4);
-        plainsNum++;
-        start.GetComponent<hexTile2>().isChecked = true;
-        GameObject[] acceptableNeighbors = new GameObject[6];
-        int neighborNum = 0;
-        for (int i = 0; i < start.GetComponent<hexTile2>().counter; i++)
-        {
-            if (!start.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isChecked && !start.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isOcean)
-            {
-                acceptableNeighbors[neighborNum] = start.GetComponent<hexTile2>().neighbors[i];
-                neighborNum++;
-            }
-        }
-        int numTurning = Random.Range(0, neighborNum);
-        if (numTurning != 0)
-        {
-            bool[] selectedNeighbors = new bool[6];
-            for (int k = 0; k < 6; k++)
-            {
-                selectedNeighbors[k] = false;
-            }
-            for (int i = 0; i < numTurning; i++)
-            {
-                int neighbor = 0;
-                neighbor = Random.Range(0, neighborNum);
-                while (selectedNeighbors[neighbor] == true)
-                {
-                    neighbor = Random.Range(0, neighborNum);
-                }
-                selectedNeighbors[neighbor] = true;
-                if (plainsNum == tileBiomeNum)
-                {
-                    generateBiome(acceptableNeighbors[neighbor]);
-                    break;
-                }
-                genPla(acceptableNeighbors[neighbor]);
-            }
-        }
-    }
-    void genVal(GameObject start)
-    {
-        start.GetComponent<hexTile2>().setTerrain(5);
-        valleyNum++;
-        start.GetComponent<hexTile2>().isChecked = true;
-        GameObject[] acceptableNeighbors = new GameObject[6];
-        int neighborNum = 0;
-        for (int i = 0; i < start.GetComponent<hexTile2>().counter; i++)
-        {
-            if (!start.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isChecked && !start.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isOcean)
-            {
-                acceptableNeighbors[neighborNum] = start.GetComponent<hexTile2>().neighbors[i];
-                neighborNum++;
-            }
-        }
-        int numTurning = Random.Range(0, neighborNum);
-        if (numTurning != 0)
-        {
-            bool[] selectedNeighbors = new bool[6];
-            for (int k = 0; k < 6; k++)
-            {
-                selectedNeighbors[k] = false;
-            }
-            for (int i = 0; i < numTurning; i++)
-            {
-                int neighbor = 0;
-                neighbor = Random.Range(0, neighborNum);
-                while (selectedNeighbors[neighbor] == true)
-                {
-                    neighbor = Random.Range(0, neighborNum);
-                }
-                selectedNeighbors[neighbor] = true;
-                if (valleyNum == tileBiomeNum)
-                {
-                    generateBiome(acceptableNeighbors[neighbor]);
-                    break;
-                }
-                genVal(acceptableNeighbors[neighbor]);
-            }
-        }
-    }
-    void genHi(GameObject start)
-    {
-        start.GetComponent<hexTile2>().setTerrain(6);
-        hillsNum++;
-        start.GetComponent<hexTile2>().isChecked = true;
-        GameObject[] acceptableNeighbors = new GameObject[6];
-        int neighborNum = 0;
-        for (int i = 0; i < start.GetComponent<hexTile2>().counter; i++)
-        {
-            if (!start.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isChecked && !start.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isOcean)
-            {
-                acceptableNeighbors[neighborNum] = start.GetComponent<hexTile2>().neighbors[i];
-                neighborNum++;
-            }
-        }
-        int numTurning = Random.Range(0, neighborNum);
-        if (numTurning != 0)
-        {
-            bool[] selectedNeighbors = new bool[6];
-            for (int k = 0; k < 6; k++)
-            {
-                selectedNeighbors[k] = false;
-            }
-            for (int i = 0; i < numTurning; i++)
-            {
-                int neighbor = 0;
-                neighbor = Random.Range(0, neighborNum);
-                while (selectedNeighbors[neighbor] == true)
-                {
-                    neighbor = Random.Range(0, neighborNum);
-                }
-                selectedNeighbors[neighbor] = true;
-                if (hillsNum == tileBiomeNum)
-                {
-                    generateBiome(acceptableNeighbors[neighbor]);
-                    break;
-                }
-                genHi(acceptableNeighbors[neighbor]);
-            }
-        }
-    }
-    void genMar(GameObject start)
-    {
-        start.GetComponent<hexTile2>().setTerrain(7);
-        marshNum++;
-        start.GetComponent<hexTile2>().isChecked = true;
-        GameObject[] acceptableNeighbors = new GameObject[6];
-        int neighborNum = 0;
-        for (int i = 0; i < start.GetComponent<hexTile2>().counter; i++)
-        {
-            if (!start.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isChecked && !start.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isOcean)
-            {
-                acceptableNeighbors[neighborNum] = start.GetComponent<hexTile2>().neighbors[i];
-                neighborNum++;
-            }
-        }
-        int numTurning = Random.Range(0, neighborNum);
-        if (numTurning != 0)
-        {
-            bool[] selectedNeighbors = new bool[6];
-            for (int k = 0; k < 6; k++)
-            {
-                selectedNeighbors[k] = false;
-            }
-            for (int i = 0; i < numTurning; i++)
-            {
-                int neighbor = 0;
-                neighbor = Random.Range(0, neighborNum);
-                while (selectedNeighbors[neighbor] == true)
-                {
-                    neighbor = Random.Range(0, neighborNum);
-                }
-                selectedNeighbors[neighbor] = true;
-                if (marshNum == tileBiomeNum)
-                {
-                    generateBiome(acceptableNeighbors[neighbor]);
-                    break;
-                }
-                genMar(acceptableNeighbors[neighbor]);
-            }
-        }
-    }
-    void genFor(GameObject start)
-    {
-        start.GetComponent<hexTile2>().setTerrain(8);
-        forestNum++;
-        start.GetComponent<hexTile2>().isChecked = true;
-        GameObject[] acceptableNeighbors = new GameObject[6];
-        int neighborNum = 0;
-        for (int i = 0; i < start.GetComponent<hexTile2>().counter; i++)
-        {
-            if (!start.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isChecked && !start.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isOcean)
-            {
-                acceptableNeighbors[neighborNum] = start.GetComponent<hexTile2>().neighbors[i];
-                neighborNum++;
-            }
-        }
-        int numTurning = Random.Range(0, neighborNum);
-        if (numTurning != 0)
-        {
-            bool[] selectedNeighbors = new bool[6];
-            for (int k = 0; k < 6; k++)
-            {
-                selectedNeighbors[k] = false;
-            }
-            for (int i = 0; i < numTurning; i++)
-            {
-                int neighbor = 0;
-                neighbor = Random.Range(0, neighborNum);
-                while (selectedNeighbors[neighbor] == true)
-                {
-                    neighbor = Random.Range(0, neighborNum);
-                }
-                selectedNeighbors[neighbor] = true;
-                if (forestNum == tileBiomeNum)
-                {
-                    generateBiome(acceptableNeighbors[neighbor]);
-                    break;
-                }
-                genFor(acceptableNeighbors[neighbor]);
-            }
-        }
-    }
-    void genTun(GameObject start)
-    {
-        start.GetComponent<hexTile2>().setTerrain(9);
-        tundraNum++;
-        start.GetComponent<hexTile2>().isChecked = true;
-        GameObject[] acceptableNeighbors = new GameObject[6];
-        int neighborNum = 0;
-        for (int i = 0; i < start.GetComponent<hexTile2>().counter; i++)
-        {
-            if (!start.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isChecked && !start.GetComponent<hexTile2>().neighbors[i].GetComponent<hexTile2>().isOcean)
-            {
-                acceptableNeighbors[neighborNum] = start.GetComponent<hexTile2>().neighbors[i];
-                neighborNum++;
-            }
-        }
-        int numTurning = Random.Range(0, neighborNum);
-        if (numTurning != 0)
-        {
-            bool[] selectedNeighbors = new bool[6];
-            for (int k = 0; k < 6; k++)
-            {
-                selectedNeighbors[k] = false;
-            }
-            for (int i = 0; i < numTurning; i++)
-            {
-                int neighbor = 0;
-                neighbor = Random.Range(0, neighborNum);
-                while (selectedNeighbors[neighbor] == true)
-                {
-                    neighbor = Random.Range(0, neighborNum);
-                }
-                selectedNeighbors[neighbor] = true;
-                if (tundraNum == tileBiomeNum)
-                {
-                    generateBiome(acceptableNeighbors[neighbor]);
-                    break;
-                }
-                genTun(acceptableNeighbors[neighbor]);
-            }
-        }
-    }
-    void createOcean()
+    void generateContinents()
     {
         for (int i = 0; i < land.Length; i++)
         {
+            hexTile2 temp = land[i].GetComponent<hexTile2>();
             GameObject[] neighbors = new GameObject[6];
-            neighbors = land[i].GetComponent<hexTile2>().neighbors;
-            float num = Random.Range(0f, (float)land[i].GetComponent<hexTile2>().counter); 
+            neighbors = temp.neighbors;
+            float num = Random.Range(0f, (float)temp.counter); 
             for (int j = 0; j < num; j++)
             {
                 if (!contains(neighbors[j], land))
