@@ -183,6 +183,8 @@ public class gridManager : MonoBehaviour {
                 temp = Instantiate(tiles[i][j + width-5], new Vector3(tiles[i][j + width-5].transform.position.x, tiles[i][j + width-5].transform.position.y, tiles[i][j + width-5].transform.position.z - maxHeight - 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c2";
                 temp.GetComponent<hexTile2>().setBorder();
+                temp.GetComponent<hexTile2>().modLayer.SetActive(false);
+                temp.GetComponent<hexTile2>().buildingLayer.SetActive(false);
             }
         }
         for (int i = 0; i < 5; i++)
@@ -195,6 +197,8 @@ public class gridManager : MonoBehaviour {
                 temp = Instantiate(tiles[i + height-5][j], new Vector3(tiles[i + height-5][j].transform.position.x - 5 * Mathf.Sqrt(3) - maxWidth, tiles[i + height-5][j].transform.position.y, tiles[i + height-5][j].transform.position.z), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c4";
                 temp.GetComponent<hexTile2>().setBorder();
+                temp.GetComponent<hexTile2>().modLayer.SetActive(false);
+                temp.GetComponent<hexTile2>().buildingLayer.SetActive(false);
             }
         }
         for (int i = 0; i < 5; i++)
@@ -213,6 +217,8 @@ public class gridManager : MonoBehaviour {
                 temp = Instantiate(tiles[i + height - 5][j + width - 5], new Vector3(tiles[i + height - 5][j + width - 5].transform.position.x - 5 * Mathf.Sqrt(3) - maxWidth, tiles[i + height - 5][j + width - 5].transform.position.y, tiles[i + height - 5][j + width - 5].transform.position.z - maxHeight - 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c8";
                 temp.GetComponent<hexTile2>().setBorder();
+                temp.GetComponent<hexTile2>().modLayer.SetActive(false);
+                temp.GetComponent<hexTile2>().buildingLayer.SetActive(false);
             }
         }
     }

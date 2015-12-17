@@ -4,6 +4,8 @@ using System.Collections;
 public class hexTile2 : MonoBehaviour {
 
     public GameObject[] borders = new GameObject[6];
+    public GameObject modLayer;
+    public GameObject buildingLayer;
     public Material normal;
     public Material highlighted;
     public Material selected;
@@ -216,42 +218,44 @@ public class hexTile2 : MonoBehaviour {
         switch (i)
         {
             case 1:
-                this.GetComponent<Renderer>().material = volcano;
+                modLayer.GetComponent<Renderer>().material = volcano;
                 modifierTypes[0] = true;
                 break;
             case 2:
-                this.GetComponent<Renderer>().material = hotSpot;
+                modLayer.GetComponent<Renderer>().material = hotSpot;
                 modifierTypes[1] = true;
                 break;
             case 3:
-                this.GetComponent<Renderer>().material = highWind;
+                modLayer.GetComponent<Renderer>().material = highWind;
                 modifierTypes[2] = true;
                 break;
             case 4:
-                this.GetComponent<Renderer>().material = river;
+                modLayer.GetComponent<Renderer>().material = river;
                 modifierTypes[3] = true;
                 break;
             case 5:
-                this.GetComponent<Renderer>().material = earthQuake;
+                modLayer.GetComponent<Renderer>().material = earthQuake;
                 modifierTypes[4] = true;
                 break;
             case 6:
-                this.GetComponent<Renderer>().material = naturalGas;
+                modLayer.GetComponent<Renderer>().material = naturalGas;
                 modifierTypes[5] = true;
                 break;
             case 7:
-                this.GetComponent<Renderer>().material = denseTrees;
+                modLayer.GetComponent<Renderer>().material = denseTrees;
                 modifierTypes[6] = true;
                 break;
             case 8:
-                this.GetComponent<Renderer>().material = coal;
+                modLayer.GetComponent<Renderer>().material = coal;
                 modifierTypes[7] = true;
                 break;
         }
+        modLayer.SetActive(true);
     }
     public void setCity()
     {
-        this.GetComponent<Renderer>().material = city;
+        buildingLayer.GetComponent<Renderer>().material = city;
+        buildingLayer.SetActive(true);
         hasCity = true;
     }
 
