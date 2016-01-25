@@ -98,7 +98,15 @@ public class gridManager : MonoBehaviour {
             for (int j = 0; j < width; j++)
             {
                 hexTile2 temp = tiles[i][j].GetComponent<hexTile2>();
-                if (!temp.hasCity && cityCounter < cityNum && !temp.isOcean)
+                bool hasMod = false;
+                for( int k = 0; k < temp.modifierTypes.Length; k++)
+                {
+                    if(temp.modifierTypes[k] == true)
+                    {
+                        hasMod = true;
+                    }
+                }
+                if (!temp.hasCity && cityCounter < cityNum && !temp.isOcean && !hasMod)
                 {
                     int r = Random.Range(0, 99);
                     if (r <= percentCity*100)
@@ -562,11 +570,12 @@ public class gridManager : MonoBehaviour {
             for (int i = 0; i < numTurning; i++)
             {
                 int neighbor = 0;
-                neighbor = Random.Range(0, neighborNum);
-                while (selectedNeighbors[neighbor] == true)
+                do
                 {
                     neighbor = Random.Range(0, neighborNum);
                 }
+                while (selectedNeighbors[neighbor] == true);
+
                 selectedNeighbors[neighbor] = true;
                 if (biomeNums[biome] == tileBiomeNum)
                 {
