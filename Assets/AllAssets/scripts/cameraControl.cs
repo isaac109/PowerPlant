@@ -54,7 +54,6 @@ public class cameraControl : MonoBehaviour {
                 {
                     this.gameObject.transform.position = new Vector3(this.gameObject.transform.position.x + (dragOrigin.x - pos.x), this.gameObject.transform.position.y, this.gameObject.transform.position.z + (dragOrigin.z - pos.z));
                 }
-                Debug.Log(pos);
             }
             else
             {

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class gridManager : MonoBehaviour {
 
@@ -27,6 +28,8 @@ public class gridManager : MonoBehaviour {
     public float maxWidth = 0;
     public float cMaxHeight = 0;
     public float cMaxWidth = 0;
+
+    public List<hexTile2> biomeSizeHolder;
 	// Use this for initialization
 	void Start () {
         foreach (int i in biomeNums)
@@ -99,6 +102,7 @@ public class gridManager : MonoBehaviour {
             {
                 hexTile2 temp = tiles[i][j].GetComponent<hexTile2>();
                 bool hasMod = false;
+                bool hasNeighborCity = false;
                 for( int k = 0; k < temp.modifierTypes.Length; k++)
                 {
                     if(temp.modifierTypes[k] == true)
@@ -106,7 +110,14 @@ public class gridManager : MonoBehaviour {
                         hasMod = true;
                     }
                 }
-                if (!temp.hasCity && cityCounter < cityNum && !temp.isOcean && !hasMod)
+                for (int k = 0; k < temp.counter; k++)
+                {
+                    if (temp.neighbors[k].GetComponent<hexTile2>().hasCity == true)
+                    {
+                        hasNeighborCity = true;
+                    }
+                }
+                if (!temp.hasCity && cityCounter < cityNum && !temp.isOcean && !hasMod && !hasNeighborCity)
                 {
                     int r = Random.Range(0, 99);
                     if (r <= percentCity*100)
@@ -436,44 +447,49 @@ public class gridManager : MonoBehaviour {
     }
     void selectBiomeAlt(GameObject start)
     {
-        if (biomeNums[0] != tileBiomeNum)
+        int biome = Random.Range(0, 8);
+        if (biomeNums[0] != tileBiomeNum && biome == 0)
         {
             genBiome(start, 0);
         }
-        else if (biomeNums[1] != tileBiomeNum)
+        else if (biomeNums[1] != tileBiomeNum && biome == 1)
         {
             genBiome(start, 1);
         }
-        else if (biomeNums[2] != tileBiomeNum)
+        else if (biomeNums[2] != tileBiomeNum && biome == 2)
         {
             genBiome(start, 2);
         }
-        else if (biomeNums[3] != tileBiomeNum)
+        else if (biomeNums[3] != tileBiomeNum && biome == 3)
         {
             genBiome(start, 3);
         }
-        else if (biomeNums[4] != tileBiomeNum)
+        else if (biomeNums[4] != tileBiomeNum && biome == 4)
         {
             genBiome(start, 4);
         }
-        else if (biomeNums[5] != tileBiomeNum)
+        else if (biomeNums[5] != tileBiomeNum && biome == 5)
         {
             genBiome(start, 5);
         }
-        else if (biomeNums[6] != tileBiomeNum)
+        else if (biomeNums[6] != tileBiomeNum && biome == 6)
         {
             genBiome(start, 6);
         }
-        else if (biomeNums[7] != tileBiomeNum)
+        else if (biomeNums[7] != tileBiomeNum && biome == 7)
         {
             genBiome(start, 7);
+        }
+        else
+        {
+            selectBiomeAlt(start);
         }
        
 
     }
     void selectBiome(GameObject start)
     {
-
+        biomeSizeHolder = new List<hexTile2>();
         int biome = Random.Range(0, 8);
         switch (biome)
         {
@@ -549,6 +565,7 @@ public class gridManager : MonoBehaviour {
         temp.setTerrain(biome + 2);
         biomeNums[biome]++;
         temp.isChecked = true;
+        biomeSizeHolder.Add(temp);
         GameObject[] acceptableNeighbors = new GameObject[6];
         int neighborNum = 0;
         for(int i = 0; i < temp.counter; i++)
@@ -577,10 +594,11 @@ public class gridManager : MonoBehaviour {
                 while (selectedNeighbors[neighbor] == true);
 
                 selectedNeighbors[neighbor] = true;
-                if (biomeNums[biome] == tileBiomeNum)
+                if (biomeNums[biome] == tileBiomeNum || biomeSizeHolder.Count >= 10)
                 {
+                    Debug.Log(biomeSizeHolder.Count);
                     selectBiome(acceptableNeighbors[neighbor]);
-                    break;
+                    return;
                 }
                 genBiome(acceptableNeighbors[neighbor], biome);
             }
