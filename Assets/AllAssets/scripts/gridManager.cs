@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class gridManager : MonoBehaviour {
 
@@ -27,6 +28,8 @@ public class gridManager : MonoBehaviour {
     public float maxWidth = 0;
     public float cMaxHeight = 0;
     public float cMaxWidth = 0;
+
+    public List<hexTile2> biomeSizeHolder;
 	// Use this for initialization
 	void Start () {
         foreach (int i in biomeNums)
@@ -56,13 +59,13 @@ public class gridManager : MonoBehaviour {
                 float num = Random.Range(0f, (float)(height*width));
                 if (num <= percentLandSeed && land.Length > landCounter)
                 {
-                    temp.GetComponent<hexTile2>().setTerrain(2);
+                    temp.GetComponent<hexTile2>().setTerrain(hexTile2.biomes.MOUNTAIN);
                     land[landCounter] = temp;
                     landCounter++;
                 }
                 else
                 {
-                    temp.GetComponent<hexTile2>().setTerrain(1);
+                    temp.GetComponent<hexTile2>().setTerrain(hexTile2.biomes.OCEAN);
                 }
             }
         }
@@ -99,6 +102,7 @@ public class gridManager : MonoBehaviour {
             {
                 hexTile2 temp = tiles[i][j].GetComponent<hexTile2>();
                 bool hasMod = false;
+                bool hasNeighborCity = false;
                 for( int k = 0; k < temp.modifierTypes.Length; k++)
                 {
                     if(temp.modifierTypes[k] == true)
@@ -106,7 +110,14 @@ public class gridManager : MonoBehaviour {
                         hasMod = true;
                     }
                 }
-                if (!temp.hasCity && cityCounter < cityNum && !temp.isOcean && !hasMod)
+                for (int k = 0; k < temp.counter; k++)
+                {
+                    if (temp.neighbors[k].GetComponent<hexTile2>().hasCity == true)
+                    {
+                        hasNeighborCity = true;
+                    }
+                }
+                if (!temp.hasCity && cityCounter < cityNum && !temp.isOcean && !hasMod && !hasNeighborCity)
                 {
                     int r = Random.Range(0, 99);
                     if (r <= percentCity*100)
@@ -131,45 +142,45 @@ public class gridManager : MonoBehaviour {
                 hexTile2 temp = tiles[i][j].GetComponent<hexTile2>();
                 if (!temp.isOcean)
                 {
-                    int mod = Random.Range(1, 9);
+                    int mod = Random.Range(0, 8);
                     int r = Random.Range(0, 100);
                     if (r <= percentModifier)
                     {
-                        temp.setModifier(mod);
+                        temp.setModifier((hexTile2.modifiers)mod);
                     }
                     else if (r <= 3 * percentModifier)
                     {
                         if (mod == 1 && temp.modifierTypes[mod - 1])
                         {
-                            temp.setModifier(mod);
+                            temp.setModifier((hexTile2.modifiers)mod);
                         }
                         if (mod == 2 && temp.modifierTypes[mod - 1])
                         {
-                            temp.setModifier(mod);
+                            temp.setModifier((hexTile2.modifiers)mod);
                         }
                         if (mod == 3 && temp.modifierTypes[mod - 1])
                         {
-                            temp.setModifier(mod);
+                            temp.setModifier((hexTile2.modifiers)mod);
                         }
                         if (mod == 4 && temp.modifierTypes[mod - 1])
                         {
-                            temp.setModifier(mod);
+                            temp.setModifier((hexTile2.modifiers)mod);
                         }
                         if (mod == 5 && temp.modifierTypes[mod - 1])
                         {
-                            temp.setModifier(mod);
+                            temp.setModifier((hexTile2.modifiers)mod);
                         }
                         if (mod == 6 && temp.modifierTypes[mod - 1])
                         {
-                            temp.setModifier(mod);
+                            temp.setModifier((hexTile2.modifiers)mod);
                         }
                         if (mod == 7 && temp.modifierTypes[mod - 1])
                         {
-                            temp.setModifier(mod);
+                            temp.setModifier((hexTile2.modifiers)mod);
                         }
                         if (mod == 8 && temp.modifierTypes[mod - 1])
                         {
-                            temp.setModifier(mod);
+                            temp.setModifier((hexTile2.modifiers)mod);
                         }
                     }
                 }
@@ -381,35 +392,35 @@ public class gridManager : MonoBehaviour {
             int num = Random.Range(1,(numOfMou+numOfDes+numOfPla+numOfVal+numOfHil+numOfMar+numOfFor+numOfTun+1));
             if (num <= numOfMou)
             {
-                temp.setTerrain(2);
+                temp.setTerrain(hexTile2.biomes.MOUNTAIN);
             }
             else if (num <= numOfDes + numOfMou)
             {
-                temp.setTerrain(3);
+                temp.setTerrain(hexTile2.biomes.DESERT);
             }
             else if (num <= numOfPla + numOfDes + numOfMou)
             {
-                temp.setTerrain(4);
+                temp.setTerrain(hexTile2.biomes.PLAINS);
             }
             else if (num <= numOfVal + numOfPla + numOfDes + numOfMou)
             {
-                temp.setTerrain(5);
+                temp.setTerrain(hexTile2.biomes.VALLEY);
             }
             else if (num <= numOfHil + numOfVal + numOfPla + numOfDes + numOfMou)
             {
-                temp.setTerrain(6);
+                temp.setTerrain(hexTile2.biomes.HILLS);
             }
             else if (num <= numOfMar + numOfHil + numOfVal + numOfPla + numOfDes + numOfMou)
             {
-                temp.setTerrain(7);
+                temp.setTerrain(hexTile2.biomes.MARSHES);
             }
             else if (num <= numOfFor + numOfMar + numOfHil + numOfVal + numOfPla + numOfDes + numOfMou)
             {
-                temp.setTerrain(8);
+                temp.setTerrain(hexTile2.biomes.FOREST);
             }
             else if (num <= numOfTun + numOfFor + numOfMar + numOfHil + numOfVal + numOfPla + numOfDes + numOfMou)
             {
-                temp.setTerrain(9);
+                temp.setTerrain(hexTile2.biomes.TUNDRA);
             }
             else
             {
@@ -436,44 +447,49 @@ public class gridManager : MonoBehaviour {
     }
     void selectBiomeAlt(GameObject start)
     {
-        if (biomeNums[0] != tileBiomeNum)
+        int biome = Random.Range(0, 8);
+        if (biomeNums[0] != tileBiomeNum && biome == 0)
         {
-            genBiome(start, 0);
+            genBiome(start, hexTile2.biomes.MOUNTAIN);
         }
-        else if (biomeNums[1] != tileBiomeNum)
+        else if (biomeNums[1] != tileBiomeNum && biome == 1)
         {
-            genBiome(start, 1);
+            genBiome(start, hexTile2.biomes.DESERT);
         }
-        else if (biomeNums[2] != tileBiomeNum)
+        else if (biomeNums[2] != tileBiomeNum && biome == 2)
         {
-            genBiome(start, 2);
+            genBiome(start, hexTile2.biomes.PLAINS);
         }
-        else if (biomeNums[3] != tileBiomeNum)
+        else if (biomeNums[3] != tileBiomeNum && biome == 3)
         {
-            genBiome(start, 3);
+            genBiome(start, hexTile2.biomes.VALLEY);
         }
-        else if (biomeNums[4] != tileBiomeNum)
+        else if (biomeNums[4] != tileBiomeNum && biome == 4)
         {
-            genBiome(start, 4);
+            genBiome(start, hexTile2.biomes.HILLS);
         }
-        else if (biomeNums[5] != tileBiomeNum)
+        else if (biomeNums[5] != tileBiomeNum && biome == 5)
         {
-            genBiome(start, 5);
+            genBiome(start, hexTile2.biomes.MOUNTAIN);
         }
-        else if (biomeNums[6] != tileBiomeNum)
+        else if (biomeNums[6] != tileBiomeNum && biome == 6)
         {
-            genBiome(start, 6);
+            genBiome(start, hexTile2.biomes.FOREST);
         }
-        else if (biomeNums[7] != tileBiomeNum)
+        else if (biomeNums[7] != tileBiomeNum && biome == 7)
         {
-            genBiome(start, 7);
+            genBiome(start, hexTile2.biomes.TUNDRA);
+        }
+        else
+        {
+            selectBiomeAlt(start);
         }
        
 
     }
     void selectBiome(GameObject start)
     {
-
+        biomeSizeHolder = new List<hexTile2>();
         int biome = Random.Range(0, 8);
         switch (biome)
         {
@@ -483,7 +499,7 @@ public class gridManager : MonoBehaviour {
                     selectBiomeAlt(start);
                     break;
                 }
-                genBiome(start, 0);
+                genBiome(start, hexTile2.biomes.MOUNTAIN);
                 break;
             case 1:
                 if (biomeNums[1] >= tileBiomeNum)
@@ -491,7 +507,7 @@ public class gridManager : MonoBehaviour {
                     selectBiomeAlt(start);
                     break;
                 }
-                genBiome(start, 1);
+                genBiome(start, hexTile2.biomes.DESERT);
                 break;
             case 2:
                 if (biomeNums[2] >= tileBiomeNum)
@@ -499,7 +515,7 @@ public class gridManager : MonoBehaviour {
                     selectBiomeAlt(start);
                     break;
                 }
-                genBiome(start, 2);
+                genBiome(start, hexTile2.biomes.PLAINS);
                 break;
             case 3:
                 if (biomeNums[3] >= tileBiomeNum)
@@ -507,7 +523,7 @@ public class gridManager : MonoBehaviour {
                     selectBiomeAlt(start);
                     break;
                 }
-                genBiome(start, 3);
+                genBiome(start, hexTile2.biomes.VALLEY);
                 break;
             case 4:
                 if (biomeNums[4] >= tileBiomeNum)
@@ -515,7 +531,7 @@ public class gridManager : MonoBehaviour {
                     selectBiomeAlt(start);
                     break;
                 }
-                genBiome(start, 4);
+                genBiome(start, hexTile2.biomes.HILLS);
                 break;
             case 5:
                 if (biomeNums[5] >= tileBiomeNum)
@@ -523,7 +539,7 @@ public class gridManager : MonoBehaviour {
                     selectBiomeAlt(start); 
                     break;
                 }
-                genBiome(start, 5);
+                genBiome(start, hexTile2.biomes.MARSHES);
                 break;
             case 6:
                 if (biomeNums[6] >= tileBiomeNum)
@@ -531,7 +547,7 @@ public class gridManager : MonoBehaviour {
                     selectBiomeAlt(start);
                     break;
                 }
-                genBiome(start, 6);
+                genBiome(start, hexTile2.biomes.FOREST);
                 break;
             case 7:
                 if (biomeNums[7] >= tileBiomeNum)
@@ -539,16 +555,17 @@ public class gridManager : MonoBehaviour {
                     selectBiomeAlt(start);
                     break;
                 }
-                genBiome(start, 7);
+                genBiome(start, hexTile2.biomes.TUNDRA);
                 break;
         }
     }
-    void genBiome(GameObject start, int biome)
+    void genBiome(GameObject start, hexTile2.biomes biome)
     {
         hexTile2 temp = start.GetComponent<hexTile2>();
-        temp.setTerrain(biome + 2);
-        biomeNums[biome]++;
+        temp.setTerrain(biome);
+        biomeNums[(int)biome - 1]++;
         temp.isChecked = true;
+        biomeSizeHolder.Add(temp);
         GameObject[] acceptableNeighbors = new GameObject[6];
         int neighborNum = 0;
         for(int i = 0; i < temp.counter; i++)
@@ -577,10 +594,11 @@ public class gridManager : MonoBehaviour {
                 while (selectedNeighbors[neighbor] == true);
 
                 selectedNeighbors[neighbor] = true;
-                if (biomeNums[biome] == tileBiomeNum)
+                if (biomeNums[(int)biome-1] == tileBiomeNum || biomeSizeHolder.Count >= 10)
                 {
+                    Debug.Log(biomeSizeHolder.Count);
                     selectBiome(acceptableNeighbors[neighbor]);
-                    break;
+                    return;
                 }
                 genBiome(acceptableNeighbors[neighbor], biome);
             }
@@ -599,7 +617,7 @@ public class gridManager : MonoBehaviour {
                 if (!contains(neighbors[j], land))
                 {
                     land = addToBack(neighbors[j], land);
-                    neighbors[j].GetComponent<hexTile2>().setTerrain(2);
+                    neighbors[j].GetComponent<hexTile2>().setTerrain(hexTile2.biomes.MOUNTAIN);
                     landCounter++;
                 }
             }

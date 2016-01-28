@@ -54,13 +54,11 @@ public class cameraControl : MonoBehaviour {
                 {
                     this.gameObject.transform.position = new Vector3(this.gameObject.transform.position.x + (dragOrigin.x - pos.x), this.gameObject.transform.position.y, this.gameObject.transform.position.z + (dragOrigin.z - pos.z));
                 }
-                Debug.Log(pos);
             }
             else
             {
                 dragOrigin = new Vector3(-100f, -100f, -100f);
             }
-
 
             cameraDistance += Input.GetAxis("Mouse ScrollWheel") * scrollSpeed;
             cameraDistance = Mathf.Clamp(cameraDistance, cameraDistanceMin, cameraDistanceMax);
@@ -91,14 +89,5 @@ public class cameraControl : MonoBehaviour {
                 this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, gm.cMaxHeight - cameraHeightMax + cBorderPercent);
             }
         }
-        
 	}
-
-    void cameraBounds()
-    {
-        //cxmin = (xcent - xmin) / (cameraDistance - cameraDistanceMin+1);
-    }
-
-
-
 }
