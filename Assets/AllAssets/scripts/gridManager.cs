@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public class gridManager : MonoBehaviour {
 
+    public GameObject testInfoHolder;
     public GameObject hex;
     public bool done = false;
     static int width = 30;
@@ -13,6 +14,7 @@ public class gridManager : MonoBehaviour {
 
     float percentLand = .5f;
     float percentLandSeed = 10;
+    int minLandSeeds = 5;
     int percentModifier = 5;
     float percentCity = .025f;
     int cityNum = 0;
@@ -20,6 +22,8 @@ public class gridManager : MonoBehaviour {
     public GameObject[] land;
     int landCounter = 0;
     bool landCreated = false;
+    int allOceanNum = 0;
+    int maxAllOceanNum = 550;
 
     int tileBiomeNum = 0;
     int[] biomeNums = new int[8];//mountain, desert, plains, valley, hills,marsh,forest,tundra
@@ -31,13 +35,26 @@ public class gridManager : MonoBehaviour {
 
     public List<hexTile2> biomeSizeHolder;
 	// Use this for initialization
+
+    public List<continents> landMasses;
+    int addNeighborChance = 100;
+    public class continents
+    {
+        public List<hexTile2> lands;
+        public continents()
+        {
+            lands = new List<hexTile2>();
+        }
+    }
+
 	void Start () {
+        testInfoHolder = GameObject.Find("testInfoHolder");
+        landMasses = new List<continents>();
         foreach (int i in biomeNums)
         {
             biomeNums[i] = 0;
         }
         int newPercentLand = (int)((float)(height * width) * percentLand);
-        Debug.Log("land" + percentLand);
         land = new GameObject[(int)newPercentLand];
         for (int i = 0; i < height; i++)
         {
@@ -62,6 +79,9 @@ public class gridManager : MonoBehaviour {
                     temp.GetComponent<hexTile2>().setTerrain(hexTile2.biomes.MOUNTAIN);
                     land[landCounter] = temp;
                     landCounter++;
+                    continents newContinent = new continents();
+                    newContinent.lands.Add(temp.GetComponent<hexTile2>());
+                    landMasses.Add(newContinent);
                 }
                 else
                 {
@@ -69,10 +89,13 @@ public class gridManager : MonoBehaviour {
                 }
             }
         }
+        if (landCounter < minLandSeeds)
+        {
+            moreLandSeeds();
+        }
         maxHeight = tiles[height - 1][width - 1].transform.position.z;
         maxWidth = tiles[height - 1][width - 1].transform.position.x;
         cityNum = (int)((float)(height * width)*(float)(percentCity));
-        Debug.Log("cityNum " + cityNum.ToString());
         cwidth = width;
         cMaxHeight = maxHeight;
         cMaxWidth = maxWidth;
@@ -87,6 +110,7 @@ public class gridManager : MonoBehaviour {
             //establishBorderNeighbors();
             generateContinents();
             landCreated = true;
+            checkOceanSize();
             createBiomes();
             clearIslandsSetCoasts();
             setModifiers();
@@ -94,6 +118,71 @@ public class gridManager : MonoBehaviour {
             createExtraMaps();
         }
 	}
+    void checkOceanSize()
+    {
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                hexTile2 temp = tiles[i][j].GetComponent<hexTile2>();
+                bool allOcean = true;
+                if (temp.isOcean)
+                {
+                    for (int k = 0; k < temp.counter; k++)
+                    {
+                        if (!temp.neighbors[k].GetComponent<hexTile2>().isOcean)
+                        {
+                            allOcean = false;
+                            break;
+                        }
+                    }
+                    if (allOcean)
+                    {
+                        //testInfoHolder.GetComponent<testInfo>().numOfOcean++;
+                        allOceanNum ++;
+                    }
+                }
+            }
+        }
+        Debug.Log("Num of ocean with all ocean neighbors: " + allOceanNum);
+        if (allOceanNum > maxAllOceanNum)
+        {
+            Application.LoadLevel("map");
+        }
+        /*
+         * for testing purposes
+        Debug.Log("iteration: " +testInfoHolder.GetComponent<testInfo>().itterationNum + "," + testInfoHolder.GetComponent<testInfo>().numOfOcean);
+        if (testInfoHolder.GetComponent<testInfo>().itterationNum < testInfoHolder.GetComponent<testInfo>().maxItteration)
+        {
+            newMapTest();
+        }
+        else
+        {
+            testInfoHolder.GetComponent<testInfo>().print();
+        }*/
+    }
+    void newMapTest()
+    {
+        testInfoHolder.GetComponent<testInfo>().itterationNum ++;
+        testInfoHolder.GetComponent<testInfo>().newMap();
+    }
+    void moreLandSeeds()
+    {
+        while (landCounter < minLandSeeds)
+        {
+            int x = Random.Range(0, width);
+            int y = Random.Range(0, height);
+            if(!contains(tiles[y][x], land))
+            {
+                tiles[y][x].GetComponent<hexTile2>().setTerrain(hexTile2.biomes.MOUNTAIN);
+                land[landCounter] = tiles[y][x];
+                landCounter++;
+                continents newContinent = new continents();
+                newContinent.lands.Add(tiles[y][x].GetComponent<hexTile2>());
+                landMasses.Add(newContinent);
+            }
+        }
+    }
     void setCitys()
     {
         for (int i = 0; i < height; i++)
@@ -432,7 +521,6 @@ public class gridManager : MonoBehaviour {
     {
         float percentBiome = .125f;
         tileBiomeNum = (int)(((float)landCounter * percentBiome)+(height*width*percentBiome*percentLand*.4f));
-        Debug.Log( " num " + tileBiomeNum);
         for (int i = 0; i < height; i++)
         {
             for (int j = 0; j < width; j++)
@@ -596,7 +684,6 @@ public class gridManager : MonoBehaviour {
                 selectedNeighbors[neighbor] = true;
                 if (biomeNums[(int)biome-1] == tileBiomeNum || biomeSizeHolder.Count >= 10)
                 {
-                    Debug.Log(biomeSizeHolder.Count);
                     selectBiome(acceptableNeighbors[neighbor]);
                     return;
                 }
@@ -614,11 +701,26 @@ public class gridManager : MonoBehaviour {
             float num = Random.Range(0f, (float)temp.counter); 
             for (int j = 0; j < num; j++)
             {
-                if (!contains(neighbors[j], land))
+                bool neighborContinent = oonOtherContinent(neighbors[j], temp);
+                bool addIfNeighborContinent = true;
+                if (neighborContinent)
+                {
+                    int r = Random.Range(0, 100);
+                    if (r >= addNeighborChance)
+                    {
+                        addIfNeighborContinent = true;
+                    }
+                    else
+                    {
+                        addIfNeighborContinent = false;
+                    }
+                }
+                if (!contains(neighbors[j], land) && addIfNeighborContinent)
                 {
                     land = addToBack(neighbors[j], land);
                     neighbors[j].GetComponent<hexTile2>().setTerrain(hexTile2.biomes.MOUNTAIN);
                     landCounter++;
+                    addToContinent(neighbors[j], temp);
                 }
             }
         }
@@ -646,5 +748,37 @@ public class gridManager : MonoBehaviour {
             }
         }
         return false;
+    }
+    bool oonOtherContinent(GameObject obj, hexTile2 origional)
+    {
+        for (int i = 0; i < landMasses.Count; i++)
+        {
+            if (landMasses[i].lands.Contains(origional))
+            {
+                continue;
+            }
+            else
+            {
+                for (int j = 0; j < obj.GetComponent<hexTile2>().counter; j++)
+                {
+                    if (landMasses[i].lands.Contains(obj.GetComponent<hexTile2>().neighbors[j].GetComponent<hexTile2>()))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    void addToContinent(GameObject obj, hexTile2 origional)
+    {
+        for (int i = 0; i < landMasses.Count; i++)
+        {
+            if(landMasses[i].lands.Contains(origional))
+            {
+                landMasses[i].lands.Add(obj.GetComponent<hexTile2>());
+                break;
+            }
+        }
     }
 }

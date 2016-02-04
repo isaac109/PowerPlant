@@ -50,6 +50,7 @@
      <Compile Include="Assets\AllAssets\scripts\hexManagement.cs" />
      <Compile Include="Assets\AllAssets\scripts\hexTile2.cs" />
      <Compile Include="Assets\AllAssets\scripts\mockHex.cs" />
+     <Compile Include="Assets\AllAssets\scripts\testInfo.cs" />
  <Reference Include="UnityEngine.Advertisements">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Advertisements/UnityEngine.Advertisements.dll</HintPath>
  </Reference>
