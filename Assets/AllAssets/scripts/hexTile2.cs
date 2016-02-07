@@ -43,6 +43,9 @@ public class hexTile2 : MonoBehaviour {
     public Camera menuCamera;
     public float cameraDistance;
 
+    public int heightInArray;
+    public int widthInArray;
+
     public enum biomes
     {
         OCEAN,

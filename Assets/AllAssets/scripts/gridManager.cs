@@ -7,19 +7,19 @@ public class gridManager : MonoBehaviour {
     public GameObject testInfoHolder;
     public GameObject hex;
     public bool done = false;
-    static int width = 30;
-    static int height = 60;
+    static int _height = 30;
+    static int _width = 60;
     public int cwidth = 0;
-    public GameObject[][] tiles = new GameObject[height][];
+    public GameObject[][] tiles = new GameObject[_width][];
 
-    float percentLand = .5f;
-    float percentLandSeed = 10;
+    float percentLand = .55f;
     int minLandSeeds = 5;
+    int maxLandSeeds = 10;
     int percentModifier = 5;
     float percentCity = .025f;
     int cityNum = 0;
     int cityCounter = 0;
-    public GameObject[] land;
+    public List<GameObject> land;
     int landCounter = 0;
     bool landCreated = false;
     int allOceanNum = 0;
@@ -27,6 +27,11 @@ public class gridManager : MonoBehaviour {
 
     int tileBiomeNum = 0;
     int[] biomeNums = new int[8];//mountain, desert, plains, valley, hills,marsh,forest,tundra
+    int biomeBleedHeight = 1;
+    List<int> rangeOfTundra = new List<int>();
+    List<int> rangeOfForest = new List<int>();
+    List<int> rangeOfDesert = new List<int>();
+    List<int> acceptableX;
 
     public float maxHeight = 0;
     public float maxWidth = 0;
@@ -48,18 +53,19 @@ public class gridManager : MonoBehaviour {
     }
 
 	void Start () {
+        Random.seed = (int)System.DateTime.Now.Ticks;
+        maxAllOceanNum = (int)(((float)(_height * _width) * (1 - percentLand)) - ((float)(_height * _width) * (1 - percentLand)) / 3 + ((float)(_height * _width) * (1 - percentLand)) / 18);
         testInfoHolder = GameObject.Find("testInfoHolder");
         landMasses = new List<continents>();
         foreach (int i in biomeNums)
         {
             biomeNums[i] = 0;
         }
-        int newPercentLand = (int)((float)(height * width) * percentLand);
-        land = new GameObject[(int)newPercentLand];
-        for (int i = 0; i < height; i++)
+        land = new List<GameObject>();
+        for (int i = 0; i < _width; i++)
         {
-            tiles[i] = new GameObject[width];
-            for (int j = 0; j < width; j++)
+            tiles[i] = new GameObject[_height];
+            for (int j = 0; j < _height; j++)
             {
                 GameObject temp;
                 if (i % 2 == 0)
@@ -72,57 +78,58 @@ public class gridManager : MonoBehaviour {
                 }
                 temp.name = "hex" + i.ToString() + "00" + j.ToString();
                 temp.GetComponent<hexTile2>().gm = this.GetComponent<gridManager>();
+                temp.GetComponent<hexTile2>().heightInArray = j;
+                temp.GetComponent<hexTile2>().widthInArray = i;
                 tiles[i][j] = temp;
-                float num = Random.Range(0f, (float)(height*width));
-                if (num <= percentLandSeed && land.Length > landCounter)
-                {
-                    temp.GetComponent<hexTile2>().setTerrain(hexTile2.biomes.MOUNTAIN);
-                    land[landCounter] = temp;
-                    landCounter++;
-                    continents newContinent = new continents();
-                    newContinent.lands.Add(temp.GetComponent<hexTile2>());
-                    landMasses.Add(newContinent);
-                }
-                else
-                {
-                    temp.GetComponent<hexTile2>().setTerrain(hexTile2.biomes.OCEAN);
-                }
+                temp.GetComponent<hexTile2>().setTerrain(hexTile2.biomes.OCEAN);
+                
             }
         }
-        if (landCounter < minLandSeeds)
-        {
-            moreLandSeeds();
-        }
-        maxHeight = tiles[height - 1][width - 1].transform.position.z;
-        maxWidth = tiles[height - 1][width - 1].transform.position.x;
-        cityNum = (int)((float)(height * width)*(float)(percentCity));
-        cwidth = width;
+        maxHeight = tiles[_width - 1][_height - 1].transform.position.z;
+        maxWidth = tiles[_width - 1][_height - 1].transform.position.x;
+        cityNum = (int)((float)(_width * _height)*(float)(percentCity));
+        cwidth = _height;
         cMaxHeight = maxHeight;
         cMaxWidth = maxWidth;
+
+        
+
         done = true;
 	}
 
     // Update is called once per frame
     void Update()
     {
-        if (tiles[height - 1][width - 1].GetComponent<hexTile2>().searched && !landCreated)
+        if (tiles[_width - 1][_height - 1].GetComponent<hexTile2>().searched && !landCreated)
         {
             //establishBorderNeighbors();
+            landSeeds();
             generateContinents();
             landCreated = true;
             checkOceanSize();
+            float percentBiome = .125f;
+            tileBiomeNum = (int)((float)landCounter * percentBiome + 10);
+            createSpecialBiomes();
             createBiomes();
             clearIslandsSetCoasts();
             setModifiers();
             setCitys();
             createExtraMaps();
+            if (testInfoHolder.GetComponent<testInfo>().itterationNum < testInfoHolder.GetComponent<testInfo>().maxItteration)
+            {
+                newMapTest();
+            }
+            else
+            {
+                testInfoHolder.GetComponent<testInfo>().print();
+            }
         }
 	}
     void checkOceanSize()
     {
-        for (int i = 0; i < height; i++)
+        for (int i = 0; i < _width; i++)
         {
-            for (int j = 0; j < width; j++)
+            for (int j = 0; j < _height; j++)
             {
                 hexTile2 temp = tiles[i][j].GetComponent<hexTile2>();
                 bool allOcean = true;
@@ -163,31 +170,57 @@ public class gridManager : MonoBehaviour {
     }
     void newMapTest()
     {
+        for (int i = 0; i < biomeNums.Length; i++)
+        {
+            testInfoHolder.GetComponent<testInfo>().biomeNums[i] = biomeNums[i];
+        }
         testInfoHolder.GetComponent<testInfo>().itterationNum ++;
         testInfoHolder.GetComponent<testInfo>().newMap();
     }
-    void moreLandSeeds()
+    void landSeeds()
     {
-        while (landCounter < minLandSeeds)
+        int x;
+        int y;
+        int heightRange = 5;
+
+        x = Random.Range(0, _width);
+        y = Random.Range(_height - heightRange, _height);
+        seed(x, y);
+
+        x = Random.Range(0, _width);
+        y = Random.Range(0, heightRange);
+        seed(x, y);
+
+        x = Random.Range(0, _width);
+        y = Random.Range(_height / 2 - heightRange / 2, _height / 2 + heightRange / 2);
+        seed(x, y);
+
+        int num = Random.Range(minLandSeeds, maxLandSeeds);
+        while (landCounter < num)
         {
-            int x = Random.Range(0, width);
-            int y = Random.Range(0, height);
-            if(!contains(tiles[y][x], land))
-            {
-                tiles[y][x].GetComponent<hexTile2>().setTerrain(hexTile2.biomes.MOUNTAIN);
-                land[landCounter] = tiles[y][x];
-                landCounter++;
-                continents newContinent = new continents();
-                newContinent.lands.Add(tiles[y][x].GetComponent<hexTile2>());
-                landMasses.Add(newContinent);
-            }
+            y = Random.Range(0, _height);
+            x = Random.Range(0, _width);
+            seed(x,y);
+        }
+    }
+    void seed(int x, int y)
+    {
+        if (!land.Contains(tiles[x][y]))
+        {
+            tiles[x][y].GetComponent<hexTile2>().setTerrain(hexTile2.biomes.MOUNTAIN);
+            tiles[x][y].GetComponent<hexTile2>().isLand = true;
+            land.Add(tiles[x][y]);
+            landCounter++;
+            continents newContinent = new continents();
+            newContinent.lands.Add(tiles[x][y].GetComponent<hexTile2>());
+            landMasses.Add(newContinent);
         }
     }
     void setCitys()
     {
-        for (int i = 0; i < height; i++)
+        for (int i = 0; i < _width; i++)
         {
-            for (int j = 0; j < width; j++)
+            for (int j = 0; j < _height; j++)
             {
                 hexTile2 temp = tiles[i][j].GetComponent<hexTile2>();
                 bool hasMod = false;
@@ -224,9 +257,9 @@ public class gridManager : MonoBehaviour {
     }
     void setModifiers()
     {
-        for (int i = 0; i < height; i++)
+        for (int i = 0; i < _width; i++)
         {
-            for (int j = 0; j < width; j++)
+            for (int j = 0; j < _height; j++)
             { 
                 hexTile2 temp = tiles[i][j].GetComponent<hexTile2>();
                 if (!temp.isOcean)
@@ -281,7 +314,7 @@ public class gridManager : MonoBehaviour {
        // GameObject temp = Instantiate(tiles[0][0], new Vector3(tiles[0][0].transform.position.x, tiles[0][0].transform.position.y, tiles[0][0].transform.position.z+maxHeight+5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
        // temp = Instantiate(tiles[0][1], new Vector3(tiles[1][0].transform.position.x, tiles[1][0].transform.position.y, tiles[1][0].transform.position.z + maxHeight + 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
        // temp = Instantiate(tiles[0][0], new Vector3(tiles[0][0].transform.position.x + 5 * Mathf.Sqrt(3)+maxWidth, tiles[0][0].transform.position.y, tiles[0][0].transform.position.z), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
-        for (int i = 0; i < height; i++)
+        for (int i = 0; i < _width; i++)
         {
             for (int j = 0; j < 5; j++)
             {
@@ -290,7 +323,7 @@ public class gridManager : MonoBehaviour {
                 temp.GetComponent<hexTile2>().setBorder();
                 temp.GetComponent<hexTile2>().modLayer.SetActive(false);
                 temp.GetComponent<hexTile2>().buildingLayer.SetActive(false);
-                temp = Instantiate(tiles[i][j + width-5], new Vector3(tiles[i][j + width-5].transform.position.x, tiles[i][j + width-5].transform.position.y, tiles[i][j + width-5].transform.position.z - maxHeight - 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
+                temp = Instantiate(tiles[i][j + _height-5], new Vector3(tiles[i][j + _height-5].transform.position.x, tiles[i][j + _height-5].transform.position.y, tiles[i][j + _height-5].transform.position.z - maxHeight - 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c2";
                 temp.GetComponent<hexTile2>().setBorder();
                 temp.GetComponent<hexTile2>().modLayer.SetActive(false);
@@ -299,14 +332,14 @@ public class gridManager : MonoBehaviour {
         }
         for (int i = 0; i < 5; i++)
         {
-            for (int j = 0; j < width; j++)
+            for (int j = 0; j < _height; j++)
             {
                 GameObject temp = Instantiate(tiles[i][j], new Vector3(tiles[i][j].transform.position.x + 5 * Mathf.Sqrt(3) + maxWidth, tiles[i][j].transform.position.y, tiles[i][j].transform.position.z), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c3";
                 temp.GetComponent<hexTile2>().setBorder();
                 temp.GetComponent<hexTile2>().modLayer.SetActive(false);
                 temp.GetComponent<hexTile2>().buildingLayer.SetActive(false);
-                temp = Instantiate(tiles[i + height-5][j], new Vector3(tiles[i + height-5][j].transform.position.x - 5 * Mathf.Sqrt(3) - maxWidth, tiles[i + height-5][j].transform.position.y, tiles[i + height-5][j].transform.position.z), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
+                temp = Instantiate(tiles[i + _width-5][j], new Vector3(tiles[i + _width-5][j].transform.position.x - 5 * Mathf.Sqrt(3) - maxWidth, tiles[i + _width-5][j].transform.position.y, tiles[i + _width-5][j].transform.position.z), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c4";
                 temp.GetComponent<hexTile2>().setBorder();
                 temp.GetComponent<hexTile2>().modLayer.SetActive(false);
@@ -322,17 +355,17 @@ public class gridManager : MonoBehaviour {
                 temp.GetComponent<hexTile2>().setBorder();
                 temp.GetComponent<hexTile2>().modLayer.SetActive(false);
                 temp.GetComponent<hexTile2>().buildingLayer.SetActive(false);
-                temp = Instantiate(tiles[i + height - 5][j], new Vector3(tiles[i + height - 5][j].transform.position.x - 5 * Mathf.Sqrt(3) - maxWidth, tiles[i + height - 5][j].transform.position.y, tiles[i + height - 5][j].transform.position.z + maxHeight + 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
+                temp = Instantiate(tiles[i + _width - 5][j], new Vector3(tiles[i + _width - 5][j].transform.position.x - 5 * Mathf.Sqrt(3) - maxWidth, tiles[i + _width - 5][j].transform.position.y, tiles[i + _width - 5][j].transform.position.z + maxHeight + 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c6";
                 temp.GetComponent<hexTile2>().setBorder();
                 temp.GetComponent<hexTile2>().modLayer.SetActive(false);
                 temp.GetComponent<hexTile2>().buildingLayer.SetActive(false);
-                temp = Instantiate(tiles[i][j + width - 5], new Vector3(tiles[i][j + width - 5].transform.position.x + 5 * Mathf.Sqrt(3) + maxWidth, tiles[i][j + width - 5].transform.position.y, tiles[i][j + width - 5].transform.position.z - maxHeight - 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
+                temp = Instantiate(tiles[i][j + _height - 5], new Vector3(tiles[i][j + _height - 5].transform.position.x + 5 * Mathf.Sqrt(3) + maxWidth, tiles[i][j + _height - 5].transform.position.y, tiles[i][j + _height - 5].transform.position.z - maxHeight - 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c7";
                 temp.GetComponent<hexTile2>().setBorder();
                 temp.GetComponent<hexTile2>().modLayer.SetActive(false);
                 temp.GetComponent<hexTile2>().buildingLayer.SetActive(false);
-                temp = Instantiate(tiles[i + height - 5][j + width - 5], new Vector3(tiles[i + height - 5][j + width - 5].transform.position.x - 5 * Mathf.Sqrt(3) - maxWidth, tiles[i + height - 5][j + width - 5].transform.position.y, tiles[i + height - 5][j + width - 5].transform.position.z - maxHeight - 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
+                temp = Instantiate(tiles[i + _width - 5][j + _height - 5], new Vector3(tiles[i + _width - 5][j + _height - 5].transform.position.x - 5 * Mathf.Sqrt(3) - maxWidth, tiles[i + _width - 5][j + _height - 5].transform.position.y, tiles[i + _width - 5][j + _height - 5].transform.position.z - maxHeight - 5), Quaternion.Euler(new Vector3(270, 180, 0))) as GameObject;
                 temp.name = "hex" + i.ToString() + "00" + j.ToString() + "c8";
                 temp.GetComponent<hexTile2>().setBorder();
                 temp.GetComponent<hexTile2>().modLayer.SetActive(false);
@@ -342,14 +375,14 @@ public class gridManager : MonoBehaviour {
     }
     /*void establishBorderNeighbors()
     {
-        for(int i=0; i < height; i++)
+        for(int i=0; i < _width; i++)
         {
-            for(int j = 0; j < width; j++)
+            for(int j = 0; j < _height; j++)
             {
-                if (j == width-1)
+                if (j == _height-1)
                 {
                     tiles[i][j].GetComponent<hexTile2>().neighbors[5] = tiles[i][0];
-                    if (i % 2 != 0 && i != height-1)
+                    if (i % 2 != 0 && i != _width-1)
                     {
                         tiles[i][j].GetComponent<hexTile2>().neighbors[3] = tiles[i - 1][0];
                         tiles[i][j].GetComponent<hexTile2>().neighbors[4] = tiles[i + 1][0];
@@ -357,44 +390,44 @@ public class gridManager : MonoBehaviour {
                 }
                 if (j == 0)
                 {
-                    tiles[i][j].GetComponent<hexTile2>().neighbors[5] = tiles[i][width-1];
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[5] = tiles[i][_height-1];
                     if (i % 2 == 0 && i != 0)
                     {
-                        tiles[i][j].GetComponent<hexTile2>().neighbors[3] = tiles[i - 1][width - 1];
-                        tiles[i][j].GetComponent<hexTile2>().neighbors[4] = tiles[i + 1][width - 1];
+                        tiles[i][j].GetComponent<hexTile2>().neighbors[3] = tiles[i - 1][_height - 1];
+                        tiles[i][j].GetComponent<hexTile2>().neighbors[4] = tiles[i + 1][_height - 1];
                     }
                 }
-                if (i == 0 && (j != 0 && j != width - 1))
+                if (i == 0 && (j != 0 && j != _height - 1))
                 {
-                    tiles[i][j].GetComponent<hexTile2>().neighbors[4] = tiles[height - 1][j];
-                    tiles[i][j].GetComponent<hexTile2>().neighbors[5] = tiles[height - 1][j - 1];
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[4] = tiles[_width - 1][j];
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[5] = tiles[_width - 1][j - 1];
                 }
-                if (i == height - 1 && (j != 0 && j != width - 1))
+                if (i == _width - 1 && (j != 0 && j != _height - 1))
                 {
                     tiles[i][j].GetComponent<hexTile2>().neighbors[4] = tiles[0][j];
                     tiles[i][j].GetComponent<hexTile2>().neighbors[5] = tiles[0][j + 1];
                 }
                 if (i == 0 && j == 0)
                 {
-                    tiles[i][j].GetComponent<hexTile2>().neighbors[2] = tiles[1][width - 1];
-                    tiles[i][j].GetComponent<hexTile2>().neighbors[3] = tiles[height - 1][width - 1];
-                    tiles[i][j].GetComponent<hexTile2>().neighbors[4] = tiles[height - 1][0];
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[2] = tiles[1][_height - 1];
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[3] = tiles[_width - 1][_height - 1];
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[4] = tiles[_width - 1][0];
                 }
-                if (i == height - 1 && j == width - 1)
+                if (i == _width - 1 && j == _height - 1)
                 {
-                    tiles[i][j].GetComponent<hexTile2>().neighbors[2] = tiles[height - 2][0];
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[2] = tiles[_width - 2][0];
                     tiles[i][j].GetComponent<hexTile2>().neighbors[3] = tiles[0][0];
-                    tiles[i][j].GetComponent<hexTile2>().neighbors[4] = tiles[0][width - 1];
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[4] = tiles[0][_height - 1];
                 }
-                if (i == height - 1 && j == 0)
+                if (i == _width - 1 && j == 0)
                 {
                     tiles[i][j].GetComponent<hexTile2>().neighbors[3] = tiles[0][0];
                     tiles[i][j].GetComponent<hexTile2>().neighbors[4] = tiles[0][1];
                 }
-                if (i == 0 && j == width - 1)
+                if (i == 0 && j == _height - 1)
                 {
-                    tiles[i][j].GetComponent<hexTile2>().neighbors[3] = tiles[height - 1][width - 1];
-                    tiles[i][j].GetComponent<hexTile2>().neighbors[4] = tiles[height - 1][width - 2];
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[3] = tiles[_width - 1][_height - 1];
+                    tiles[i][j].GetComponent<hexTile2>().neighbors[4] = tiles[_width - 1][_height - 2];
                 }
                 tiles[i][j].GetComponent<hexTile2>().counter = 6;
             }
@@ -405,7 +438,7 @@ public class gridManager : MonoBehaviour {
         hexTile2 temp = tile.GetComponent<hexTile2>();
         for (int i = 0; i < temp.counter; i++)
         {
-            if (temp.neighbors[i].GetComponent<hexTile2>().isOcean && !temp.isOcean)
+            if (!temp.neighbors[i].GetComponent<hexTile2>().isOcean && temp.isOcean)
             {
                 temp.isCoast = true;
                 break;
@@ -414,9 +447,9 @@ public class gridManager : MonoBehaviour {
     }
     void clearIslandsSetCoasts()
     {
-        for (int i = 0; i < height; i++)
+        for (int i = 0; i < _width; i++)
         {
-            for (int j = 0; j < width; j++)
+            for (int j = 0; j < _height; j++)
             {
                 changeIfIsland(tiles[i][j]);
                 setIfCoast(tiles[i][j]);
@@ -469,6 +502,10 @@ public class gridManager : MonoBehaviour {
                 numOfTun++;
             }
         }
+        if (numOfMou + numOfDes + numOfPla + numOfVal + numOfHil + numOfMar + numOfFor + numOfTun == 0)
+        {
+            temp.setTerrain(hexTile2.biomes.OCEAN);
+        }
         if ((temp.biomeTypes[0] && numOfMou == 0) ||
             (temp.biomeTypes[1] && numOfDes == 0) ||
             (temp.biomeTypes[2] && numOfPla == 0) ||
@@ -517,13 +554,124 @@ public class gridManager : MonoBehaviour {
             }
         }
     }
+    void createSpecialBiomes()
+    { 
+        int heightChunk = _height / 5;
+
+        for(int i =0; i < _height; i++)
+        {
+            if (i >= (_height - heightChunk - biomeBleedHeight) || i <= heightChunk + biomeBleedHeight)
+            {
+                rangeOfTundra.Add(i);
+            }
+            if ((i <= (_height - heightChunk + biomeBleedHeight - 2) && i >= (_height - heightChunk * 2) - biomeBleedHeight + 2) ||
+                    (i >= heightChunk - biomeBleedHeight + 2 && i <= heightChunk * 2 + biomeBleedHeight - 2))
+            {
+                rangeOfForest.Add(i);
+            }
+            if (i <= (_height - heightChunk * 2 + biomeBleedHeight) && i >= (heightChunk * 2) - biomeBleedHeight)
+            {
+                rangeOfDesert.Add(i);
+            }
+        }
+
+        int counter = 0;
+        int counterMax = 500;
+        while (biomeNums[1] < tileBiomeNum)
+        {
+            int y = Random.Range(0, rangeOfDesert.Count);
+            y = rangeOfDesert[y];
+            acceptableX = new List<int>();
+            for (int i = 0; i < _width; i++)
+            {
+                if (tiles[i][y].GetComponent<hexTile2>().isLand)
+                {
+                    acceptableX.Add(i);
+                }
+            }
+            if (acceptableX.Count == 0)
+            {
+                rangeOfDesert.RemoveAt(y);
+                continue;
+            }
+            int x = Random.Range(0, acceptableX.Count);
+            x = acceptableX[x];
+            if (tiles[x][y].GetComponent<hexTile2>().isLand && !tiles[x][y].GetComponent<hexTile2>().isChecked)
+            {
+                genBiome(tiles[x][y], hexTile2.biomes.DESERT);
+            }
+            if (rangeOfDesert.Count == 0 || counter > counterMax)
+            {
+                break;
+            }
+            counter++;
+        }
+        counter = 0;
+        while (biomeNums[6] < tileBiomeNum)
+        {
+            int y = Random.Range(0, rangeOfForest.Count);
+            y = rangeOfForest[y];
+            acceptableX = new List<int>();
+            for (int i = 0; i < _width; i++)
+            {
+                if (tiles[i][y].GetComponent<hexTile2>().isLand)
+                {
+                    acceptableX.Add(i);
+                }
+            }
+            if (acceptableX.Count == 0)
+            {
+                rangeOfForest.RemoveAt(y);
+                continue;
+            }
+            int x = Random.Range(0, acceptableX.Count);
+            x = acceptableX[x];
+            if (tiles[x][y].GetComponent<hexTile2>().isLand && !tiles[x][y].GetComponent<hexTile2>().isChecked)
+            {
+                genBiome(tiles[x][y], hexTile2.biomes.FOREST);
+            }
+            if (rangeOfForest.Count == 0 || counter > counterMax)
+            {
+                break;
+            }
+            counter++;
+        }
+        counter = 0;
+        while (biomeNums[7] < tileBiomeNum)
+        {
+            int y = Random.Range(0, rangeOfTundra.Count-1);
+            y = rangeOfTundra[y];
+            acceptableX = new List<int>();
+            for (int i = 0; i < _width; i++)
+            {
+                if (tiles[i][y].GetComponent<hexTile2>().isLand)
+                {
+                    acceptableX.Add(i);
+                }
+            }
+            if (acceptableX.Count == 0)
+            {
+                rangeOfTundra.RemoveAt(y);
+                continue;
+            }
+            int x = Random.Range(0, acceptableX.Count - 1);
+            x = acceptableX[x];
+            if (tiles[x][y].GetComponent<hexTile2>().isLand && !tiles[x][y].GetComponent<hexTile2>().isChecked)
+            {
+                genBiome(tiles[x][y], hexTile2.biomes.TUNDRA);
+            }
+            if (rangeOfTundra.Count == 0 || counter > counterMax)
+            {
+                break;
+            }
+            counter++;
+        }
+    }
     void createBiomes()
     {
-        float percentBiome = .125f;
-        tileBiomeNum = (int)(((float)landCounter * percentBiome)+(height*width*percentBiome*percentLand*.4f));
-        for (int i = 0; i < height; i++)
+        for (int i = 0; i < _width; i++)
         {
-            for (int j = 0; j < width; j++)
+            for (int j = 0; j < _height; j++)
             {
                 hexTile2 temp = tiles[i][j].GetComponent<hexTile2>();
                 if (!temp.isChecked && !temp.isOcean)
@@ -533,116 +681,43 @@ public class gridManager : MonoBehaviour {
             }
         }
     }
-    void selectBiomeAlt(GameObject start)
-    {
-        int biome = Random.Range(0, 8);
-        if (biomeNums[0] != tileBiomeNum && biome == 0)
-        {
-            genBiome(start, hexTile2.biomes.MOUNTAIN);
-        }
-        else if (biomeNums[1] != tileBiomeNum && biome == 1)
-        {
-            genBiome(start, hexTile2.biomes.DESERT);
-        }
-        else if (biomeNums[2] != tileBiomeNum && biome == 2)
-        {
-            genBiome(start, hexTile2.biomes.PLAINS);
-        }
-        else if (biomeNums[3] != tileBiomeNum && biome == 3)
-        {
-            genBiome(start, hexTile2.biomes.VALLEY);
-        }
-        else if (biomeNums[4] != tileBiomeNum && biome == 4)
-        {
-            genBiome(start, hexTile2.biomes.HILLS);
-        }
-        else if (biomeNums[5] != tileBiomeNum && biome == 5)
-        {
-            genBiome(start, hexTile2.biomes.MOUNTAIN);
-        }
-        else if (biomeNums[6] != tileBiomeNum && biome == 6)
-        {
-            genBiome(start, hexTile2.biomes.FOREST);
-        }
-        else if (biomeNums[7] != tileBiomeNum && biome == 7)
-        {
-            genBiome(start, hexTile2.biomes.TUNDRA);
-        }
-        else
-        {
-            selectBiomeAlt(start);
-        }
-       
-
-    }
     void selectBiome(GameObject start)
     {
         biomeSizeHolder = new List<hexTile2>();
-        int biome = Random.Range(0, 8);
+        List<int> notFullBiomes = new List<int>();
+        for (int i = 0; i < biomeNums.Length; i++)
+        {
+            if (biomeNums[i] < tileBiomeNum)
+            {
+                notFullBiomes.Add(i);
+            }
+        }
+        int biome = Random.Range(0, notFullBiomes.Count);
+        biome = notFullBiomes[biome];
         switch (biome)
         {
             case 0:
-                if (biomeNums[0] >= tileBiomeNum)
-                {
-                    selectBiomeAlt(start);
-                    break;
-                }
                 genBiome(start, hexTile2.biomes.MOUNTAIN);
                 break;
             case 1:
-                if (biomeNums[1] >= tileBiomeNum)
-                {
-                    selectBiomeAlt(start);
-                    break;
-                }
                 genBiome(start, hexTile2.biomes.DESERT);
                 break;
             case 2:
-                if (biomeNums[2] >= tileBiomeNum)
-                {
-                    selectBiomeAlt(start);
-                    break;
-                }
                 genBiome(start, hexTile2.biomes.PLAINS);
                 break;
             case 3:
-                if (biomeNums[3] >= tileBiomeNum)
-                {
-                    selectBiomeAlt(start);
-                    break;
-                }
                 genBiome(start, hexTile2.biomes.VALLEY);
                 break;
             case 4:
-                if (biomeNums[4] >= tileBiomeNum)
-                {
-                    selectBiomeAlt(start);
-                    break;
-                }
                 genBiome(start, hexTile2.biomes.HILLS);
                 break;
             case 5:
-                if (biomeNums[5] >= tileBiomeNum)
-                {
-                    selectBiomeAlt(start); 
-                    break;
-                }
                 genBiome(start, hexTile2.biomes.MARSHES);
                 break;
             case 6:
-                if (biomeNums[6] >= tileBiomeNum)
-                {
-                    selectBiomeAlt(start);
-                    break;
-                }
                 genBiome(start, hexTile2.biomes.FOREST);
                 break;
             case 7:
-                if (biomeNums[7] >= tileBiomeNum)
-                {
-                    selectBiomeAlt(start);
-                    break;
-                }
                 genBiome(start, hexTile2.biomes.TUNDRA);
                 break;
         }
@@ -650,6 +725,14 @@ public class gridManager : MonoBehaviour {
     void genBiome(GameObject start, hexTile2.biomes biome)
     {
         hexTile2 temp = start.GetComponent<hexTile2>();
+        if (!checkBiomeLocation(temp, biome))
+        {
+            return;
+        }
+        if (biome == hexTile2.biomes.DESERT || biome == hexTile2.biomes.TUNDRA || biome == hexTile2.biomes.FOREST)
+        {
+            acceptableX.Remove(temp.widthInArray);
+        }
         temp.setTerrain(biome);
         biomeNums[(int)biome - 1]++;
         temp.isChecked = true;
@@ -684,24 +767,62 @@ public class gridManager : MonoBehaviour {
                 selectedNeighbors[neighbor] = true;
                 if (biomeNums[(int)biome-1] == tileBiomeNum || biomeSizeHolder.Count >= 10)
                 {
-                    selectBiome(acceptableNeighbors[neighbor]);
                     return;
                 }
                 genBiome(acceptableNeighbors[neighbor], biome);
             }
         }
     }
+    bool checkBiomeLocation(hexTile2 tile, hexTile2.biomes biome)
+    {
+        int heightChunk = _height / 5;
+        int heightInArray = tile.heightInArray;
+        switch (biome)
+        {
+            case hexTile2.biomes.TUNDRA:
+                if (heightInArray >= (_height - heightChunk - biomeBleedHeight) || heightInArray <= heightChunk + biomeBleedHeight)
+                {
+                    return true;
+                }
+                break;
+            case hexTile2.biomes.FOREST:
+                if ((heightInArray <= (_height - heightChunk + biomeBleedHeight) && heightInArray >= (_height - heightChunk * 2) - biomeBleedHeight) ||
+                    (heightInArray >= heightChunk - biomeBleedHeight && heightInArray <= heightChunk * 2 + biomeBleedHeight))
+                {
+                    return true;
+                }
+                break;
+            case hexTile2.biomes.DESERT:
+                if(heightInArray <= (_height - heightChunk*2 + biomeBleedHeight) && heightInArray >= (heightChunk*2) - biomeBleedHeight)
+                {
+                    return true;
+                }
+                break;
+            default:
+                return true;
+        }
+        return false;
+    }
     void generateContinents()
     {
-        for (int i = 0; i < land.Length; i++)
+        for (int i = 0; i < land.Count; i++)
         {
-            hexTile2 temp = land[i].GetComponent<hexTile2>();
-            GameObject[] neighbors = new GameObject[6];
-            neighbors = temp.neighbors;
-            float num = Random.Range(0f, (float)temp.counter); 
-            for (int j = 0; j < num; j++)
+            if (land.Count >= (_width * _height * percentLand))
             {
-                bool neighborContinent = oonOtherContinent(neighbors[j], temp);
+                return;
+            }
+            hexTile2 temp = land[i].GetComponent<hexTile2>();
+            List<GameObject> neighbors = new List<GameObject>();
+            for (int j = 0; j < temp.counter; j++)
+            {
+                neighbors.Add(temp.neighbors[j]);
+            }
+            int num = Random.Range(0, neighbors.Count);
+            int counter = 0;
+            while (counter < num)
+            {
+                int selected = Random.Range(0, neighbors.Count);
+                bool neighborContinent = onOtherContinent(neighbors[selected], temp);
                 bool addIfNeighborContinent = true;
                 if (neighborContinent)
                 {
@@ -715,16 +836,22 @@ public class gridManager : MonoBehaviour {
                         addIfNeighborContinent = false;
                     }
                 }
-                if (!contains(neighbors[j], land) && addIfNeighborContinent)
+                if (!land.Contains(neighbors[selected]) && addIfNeighborContinent)
                 {
-                    land = addToBack(neighbors[j], land);
-                    neighbors[j].GetComponent<hexTile2>().setTerrain(hexTile2.biomes.MOUNTAIN);
+                    land.Add(neighbors[selected]);
+                    neighbors[selected].GetComponent<hexTile2>().setTerrain(hexTile2.biomes.MOUNTAIN);
+                    neighbors[selected].GetComponent<hexTile2>().isLand = true;
                     landCounter++;
-                    addToContinent(neighbors[j], temp);
+                    addToContinent(neighbors[selected], temp);
                 }
+                neighbors.RemoveAt(selected);
+                counter++;
             }
         }
-        
+        if(land.Count < (_width*_height*percentLand))
+        {
+            generateContinents();
+        }
     }
     GameObject[] addToBack(GameObject obj, GameObject[] arr)
     {
@@ -749,7 +876,7 @@ public class gridManager : MonoBehaviour {
         }
         return false;
     }
-    bool oonOtherContinent(GameObject obj, hexTile2 origional)
+    bool onOtherContinent(GameObject obj, hexTile2 origional)
     {
         for (int i = 0; i < landMasses.Count; i++)
         {
