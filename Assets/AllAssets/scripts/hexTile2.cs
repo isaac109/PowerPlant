@@ -3,6 +3,7 @@ using System.Collections;
 
 public class hexTile2 : MonoBehaviour {
 
+    public GameObject canvas;
     public GameObject[] borders = new GameObject[6];
     public GameObject modLayer;
     public GameObject buildingLayer;
@@ -16,7 +17,7 @@ public class hexTile2 : MonoBehaviour {
     public bool searched = false;
     public Collider[] objects;
     public GameObject[] neighbors = new GameObject[6];
-    public Material[] baseTiles = new Material[9];
+    public Material[] baseTiles = new Material[11];
     public Material[] modTiles = new Material[8];
 
     public Material border;
@@ -25,6 +26,8 @@ public class hexTile2 : MonoBehaviour {
 
     public bool isOcean = false;
     public bool isLand = false;
+    public bool isFrozen = false;
+
     //isMountain, isDesert, isPlains, isValley, isHills, isMarshes, isForest, isTundra
     public bool[] biomeTypes = { false, false, false, false, false, false, false, false };
     //hasVolcano, hasHotSpot, hasHighWinds, hasRiver, hasEarthquake, hasNaturalGas, hasDenseTrees, hasCoal
@@ -56,7 +59,9 @@ public class hexTile2 : MonoBehaviour {
         HILLS,
         MARSHES,
         FOREST,
-        TUNDRA
+        TUNDRA,
+        GLACIER,
+        ICEBERG
     }
 
     public enum modifiers
@@ -72,6 +77,7 @@ public class hexTile2 : MonoBehaviour {
     }
 	// Use this for initialization
 	void Start () {
+        canvas = GameObject.Find("Canvas");
         this.gameObject.tag = "Tile";
         for (int i = 0; i < borders.Length; i++)
         {
@@ -101,7 +107,7 @@ public class hexTile2 : MonoBehaviour {
             }
             searched = true;
         }
-        if (isMouseOver && Input.GetMouseButtonDown(0))
+        if (isMouseOver && Input.GetMouseButtonDown(0) && !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
         {
             zoom();
         }
@@ -115,6 +121,7 @@ public class hexTile2 : MonoBehaviour {
 	}
     public void zoom()
     {
+        canvas.SetActive(false);
         if (mainCamera.GetComponent<cameraControl>().currTile != null)
         {
             mainCamera.GetComponent<cameraControl>().currTile.GetComponent<hexManagement>().close();
@@ -132,6 +139,7 @@ public class hexTile2 : MonoBehaviour {
     public void setTerrain(biomes biome)
     {
         isOcean = false;
+        isFrozen = false;
         for (int j = 0; j < biomeTypes.Length; j++)
         {
             biomeTypes[j] = false;
@@ -174,6 +182,16 @@ public class hexTile2 : MonoBehaviour {
                 this.GetComponent<Renderer>().material = baseTiles[8];
                 biomeTypes[7] = true;
                 break;
+            case biomes.GLACIER:
+                this.GetComponent<Renderer>().material = baseTiles[9];
+                isFrozen = true;
+                isOcean = true;
+                break;
+            case biomes.ICEBERG:
+                this.GetComponent<Renderer>().material = baseTiles[10];
+                isFrozen = true;
+                isOcean = true;
+                break;
         }
     }
 
@@ -183,54 +201,69 @@ public class hexTile2 : MonoBehaviour {
         Destroy(this);
     }
 
-    public void setModifier(modifiers mod)
+    public void setModifier(modifiers mod, bool set)
     {
         for (int j = 0; j < modifierTypes.Length; j++)
         {
             modifierTypes[j] = false;
         }
-        switch (mod)
+        if (set)
         {
-            case modifiers.VOLCANO:
-                modLayer.GetComponent<Renderer>().material = modTiles[0];
-                modifierTypes[0] = true;
-                break;
-            case modifiers.HOT_SPOT:
-                modLayer.GetComponent<Renderer>().material = modTiles[1];
-                modifierTypes[1] = true;
-                break;
-            case modifiers.HIGH_WIND:
-                modLayer.GetComponent<Renderer>().material = modTiles[2];
-                modifierTypes[2] = true;
-                break;
-            case modifiers.RIVER:
-                modLayer.GetComponent<Renderer>().material = modTiles[3];
-                modifierTypes[3] = true;
-                break;
-            case modifiers.EARTHQUAKE:
-                modLayer.GetComponent<Renderer>().material = modTiles[4];
-                modifierTypes[4] = true;
-                break;
-            case modifiers.NATURAL_GAS:
-                modLayer.GetComponent<Renderer>().material = modTiles[5];
-                modifierTypes[5] = true;
-                break;
-            case modifiers.DENSE_TREES:
-                modLayer.GetComponent<Renderer>().material = modTiles[6];
-                modifierTypes[6] = true;
-                break;
-            case modifiers.COAL:
-                modLayer.GetComponent<Renderer>().material = modTiles[7];
-                modifierTypes[7] = true;
-                break;
+            switch (mod)
+            {
+                case modifiers.VOLCANO:
+                    modLayer.GetComponent<Renderer>().material = modTiles[0];
+                    modifierTypes[0] = true;
+                    break;
+                case modifiers.HOT_SPOT:
+                    modLayer.GetComponent<Renderer>().material = modTiles[1];
+                    modifierTypes[1] = true;
+                    break;
+                case modifiers.HIGH_WIND:
+                    modLayer.GetComponent<Renderer>().material = modTiles[2];
+                    modifierTypes[2] = true;
+                    break;
+                case modifiers.RIVER:
+                    modLayer.GetComponent<Renderer>().material = modTiles[3];
+                    modifierTypes[3] = true;
+                    break;
+                case modifiers.EARTHQUAKE:
+                    modLayer.GetComponent<Renderer>().material = modTiles[4];
+                    modifierTypes[4] = true;
+                    break;
+                case modifiers.NATURAL_GAS:
+                    modLayer.GetComponent<Renderer>().material = modTiles[5];
+                    modifierTypes[5] = true;
+                    break;
+                case modifiers.DENSE_TREES:
+                    modLayer.GetComponent<Renderer>().material = modTiles[6];
+                    modifierTypes[6] = true;
+                    break;
+                case modifiers.COAL:
+                    modLayer.GetComponent<Renderer>().material = modTiles[7];
+                    modifierTypes[7] = true;
+                    break;
+            }
+            modLayer.SetActive(true);
         }
-        modLayer.SetActive(true);
+        else
+        {
+            modLayer.SetActive(false);
+        }
     }
-    public void setCity()
+    public void setCity(bool set)
     {
-        buildingLayer.GetComponent<Renderer>().material = city;
-        buildingLayer.SetActive(true);
-        hasCity = true;
+        if (set)
+        {
+            buildingLayer.GetComponent<Renderer>().material = city;
+            buildingLayer.SetActive(true);
+            hasCity = true;
+        }
+        else
+        {
+            buildingLayer.SetActive(false);
+            hasCity = false;
+        }
     }
 
     void OnMouseOver()
@@ -259,6 +292,7 @@ public class hexTile2 : MonoBehaviour {
         //mainCamera.GetComponent<cameraControl>().tempCameradistance = 0;
         mainCamera.GetComponent<cameraControl>().canControl = true;
         mainCamera.GetComponent<cameraControl>().currTile = null;
+        canvas.SetActive(true);
         OnMouseExit();
     }
     public void removeScript()

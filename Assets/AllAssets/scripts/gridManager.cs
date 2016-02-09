@@ -12,7 +12,7 @@ public class gridManager : MonoBehaviour {
     public int cwidth = 0;
     public GameObject[][] tiles = new GameObject[_width][];
 
-    float percentLand = .55f;
+    float percentLand = .75f;
     int minLandSeeds = 5;
     int maxLandSeeds = 10;
     int percentModifier = 5;
@@ -24,6 +24,7 @@ public class gridManager : MonoBehaviour {
     bool landCreated = false;
     int allOceanNum = 0;
     int maxAllOceanNum = 550;
+    int moveCoastCounter = 0;
 
     int tileBiomeNum = 0;
     int[] biomeNums = new int[8];//mountain, desert, plains, valley, hills,marsh,forest,tundra
@@ -32,6 +33,12 @@ public class gridManager : MonoBehaviour {
     List<int> rangeOfForest = new List<int>();
     List<int> rangeOfDesert = new List<int>();
     List<int> acceptableX;
+
+    List<GameObject> polarWater;
+    float percentFrozenCaps = .5f;
+    float environmentHealth = 1f;
+    public int maxNumFrozenCaps;
+    public int numFrozenCaps;
 
     public float maxHeight = 0;
     public float maxWidth = 0;
@@ -51,6 +58,10 @@ public class gridManager : MonoBehaviour {
             lands = new List<hexTile2>();
         }
     }
+
+    bool isTest = false;
+    bool isRealistic = true;
+
 
 	void Start () {
         Random.seed = (int)System.DateTime.Now.Ticks;
@@ -100,7 +111,7 @@ public class gridManager : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-        if (tiles[_width - 1][_height - 1].GetComponent<hexTile2>().searched && !landCreated)
+        if (!landCreated && tiles[_width - 1][_height - 1].GetComponent<hexTile2>().searched)
         {
             //establishBorderNeighbors();
             landSeeds();
@@ -109,22 +120,37 @@ public class gridManager : MonoBehaviour {
             checkOceanSize();
             float percentBiome = .125f;
             tileBiomeNum = (int)((float)landCounter * percentBiome + 10);
-            createSpecialBiomes();
-            createBiomes();
-            clearIslandsSetCoasts();
+            if (isRealistic)
+            {
+                createSpecialBiomes();
+            }
+            createBiomes();           
+            clearIslandsSetCoasts();            
             setModifiers();
             setCitys();
             createExtraMaps();
-            if (testInfoHolder.GetComponent<testInfo>().itterationNum < testInfoHolder.GetComponent<testInfo>().maxItteration)
+            setPolarCaps();
+            modifyPolarCap();
+            if (isTest)
             {
-                newMapTest();
-            }
-            else
-            {
-                testInfoHolder.GetComponent<testInfo>().print();
+                if (testInfoHolder.GetComponent<testInfo>().itterationNum < testInfoHolder.GetComponent<testInfo>().maxItteration)
+                {
+                    newMapTest();
+                }
+                else
+                {
+                    testInfoHolder.GetComponent<testInfo>().print();
+                }
             }
         }
+        
 	}
+    public void nextTurn()
+    {
+        environmentHealth -= .1f;
+        modifyPolarCap();
+        moveInCoasts();
+    }
     void checkOceanSize()
     {
         for (int i = 0; i < _width; i++)
@@ -244,7 +270,7 @@ public class gridManager : MonoBehaviour {
                     int r = Random.Range(0, 99);
                     if (r <= percentCity*100)
                     {
-                        temp.setCity();
+                        temp.setCity(true);
                         cityCounter++;
                     }
                 }
@@ -268,41 +294,41 @@ public class gridManager : MonoBehaviour {
                     int r = Random.Range(0, 100);
                     if (r <= percentModifier)
                     {
-                        temp.setModifier((hexTile2.modifiers)mod);
+                        temp.setModifier((hexTile2.modifiers)mod, true);
                     }
                     else if (r <= 3 * percentModifier)
                     {
                         if (mod == 1 && temp.modifierTypes[mod - 1])
                         {
-                            temp.setModifier((hexTile2.modifiers)mod);
+                            temp.setModifier((hexTile2.modifiers)mod, true);
                         }
                         if (mod == 2 && temp.modifierTypes[mod - 1])
                         {
-                            temp.setModifier((hexTile2.modifiers)mod);
+                            temp.setModifier((hexTile2.modifiers)mod, true);
                         }
                         if (mod == 3 && temp.modifierTypes[mod - 1])
                         {
-                            temp.setModifier((hexTile2.modifiers)mod);
+                            temp.setModifier((hexTile2.modifiers)mod, true);
                         }
                         if (mod == 4 && temp.modifierTypes[mod - 1])
                         {
-                            temp.setModifier((hexTile2.modifiers)mod);
+                            temp.setModifier((hexTile2.modifiers)mod, true);
                         }
                         if (mod == 5 && temp.modifierTypes[mod - 1])
                         {
-                            temp.setModifier((hexTile2.modifiers)mod);
+                            temp.setModifier((hexTile2.modifiers)mod, true);
                         }
                         if (mod == 6 && temp.modifierTypes[mod - 1])
                         {
-                            temp.setModifier((hexTile2.modifiers)mod);
+                            temp.setModifier((hexTile2.modifiers)mod, true);
                         }
                         if (mod == 7 && temp.modifierTypes[mod - 1])
                         {
-                            temp.setModifier((hexTile2.modifiers)mod);
+                            temp.setModifier((hexTile2.modifiers)mod, true);
                         }
                         if (mod == 8 && temp.modifierTypes[mod - 1])
                         {
-                            temp.setModifier((hexTile2.modifiers)mod);
+                            temp.setModifier((hexTile2.modifiers)mod, true);
                         }
                     }
                 }
@@ -456,6 +482,44 @@ public class gridManager : MonoBehaviour {
             }
         }
     }
+    void moveInCoasts()
+    {
+        bool moveCoast = false;
+        if (environmentHealth <= .2 && moveCoastCounter == 0)
+        {
+            moveCoastCounter++;
+            moveCoast = true;
+        }
+        if (moveCoast)
+        {
+            List<hexTile2> coasts = new List<hexTile2>();
+            for (int i = 0; i < _width; i++)
+            {
+                for (int j = 0; j < _height; j++)
+                {
+                    if (tiles[i][j].GetComponent<hexTile2>().isCoast)
+                    {
+                        coasts.Add(tiles[i][j].GetComponent<hexTile2>());
+                    }
+                }
+            }
+            for (int i = 0; i < coasts.Count; i++)
+            {
+                for (int j = 0; j < coasts[i].counter; j++)
+                {
+                    hexTile2 temp = coasts[i].neighbors[j].GetComponent<hexTile2>();
+                    if (temp.isLand)
+                    {
+                        temp.setTerrain(hexTile2.biomes.OCEAN);
+                        temp.setModifier(hexTile2.modifiers.COAL, false);
+                        temp.setCity(false);
+                        temp.isCoast = true;
+                    }
+                }
+                coasts[i].isCoast = false;
+            }
+        }
+    }
     void changeIfIsland(GameObject tile)
     {
         int numOfMou = 0;
@@ -551,6 +615,110 @@ public class gridManager : MonoBehaviour {
             else
             {
                 Debug.Log("Something went wrong");
+            }
+        }
+    }
+    void setPolarCaps()
+    {
+        polarWater = new List<GameObject>(); 
+        for (int i = 0; i < _width; i++)
+        {
+            for (int j = 0; j < _height; j++)
+            {
+                if ((j < _height / 5 || j > _height - _height / 5) && tiles[i][j].GetComponent<hexTile2>().isOcean &&
+                    !tiles[i][j].GetComponent<hexTile2>().isFrozen)
+                {
+                    polarWater.Add(tiles[i][j]);
+                }
+            }
+        }
+        maxNumFrozenCaps = (int)(environmentHealth * percentFrozenCaps * polarWater.Count);
+        while (numFrozenCaps < maxNumFrozenCaps)
+        {        
+            int i = Random.Range(0, polarWater.Count - 1);
+            biomeSizeHolder = new List<hexTile2>();
+            genPolarCaps(polarWater[i]);
+        }
+    }
+    void genPolarCaps(GameObject start)
+    {
+        if (biomeSizeHolder.Count >= 10)
+        {
+            return;
+        }
+        hexTile2 temp = start.GetComponent<hexTile2>();
+        temp.setTerrain(hexTile2.biomes.GLACIER);
+        temp.isChecked = true;
+        numFrozenCaps++;
+        biomeSizeHolder.Add(temp);
+        List<GameObject> acceptableNeighbors = new List<GameObject>();
+        for (int i = 0; i < temp.counter; i++)
+        {
+            if (!temp.neighbors[i].GetComponent<hexTile2>().isChecked && temp.neighbors[i].GetComponent<hexTile2>().isOcean 
+                && (temp.neighbors[i].GetComponent<hexTile2>().heightInArray < _height/5 || 
+                temp.neighbors[i].GetComponent<hexTile2>().heightInArray > _height- _height/5))
+            {
+                acceptableNeighbors.Add(temp.neighbors[i]);
+            }
+        }
+        int numTurning = Random.Range(0, acceptableNeighbors.Count);
+        if (numTurning != 0)
+        {
+            for (int i = 0; i < numTurning; i++)
+            {
+                int neighbor = Random.Range(0,acceptableNeighbors.Count-1);
+                polarWater.Remove(start);
+                genPolarCaps(acceptableNeighbors[neighbor]);
+            }
+        }
+    }
+    void modifyPolarCap()
+    {
+        for (int i = 0; i < _width; i++)
+        {
+            for (int j = 0; j < _height; j++)
+            {
+                hexTile2 temp = tiles[i][j].GetComponent<hexTile2>();
+                if (temp.isFrozen)
+                {
+                    if (temp.heightInArray > (int)(_height / 5 * environmentHealth) -1 || temp.heightInArray < (int)(_height - _height / 5 * environmentHealth) +1)
+                    {
+                        temp.setTerrain(hexTile2.biomes.OCEAN);
+                    }
+                    if (temp.heightInArray == (int)(_height / 5 * environmentHealth) -1 || temp.heightInArray == (int)( _height - _height / 5 * environmentHealth) +1)
+                    {
+                        temp.setTerrain(hexTile2.biomes.ICEBERG);
+                    }
+                    if (temp.heightInArray < (int)(_height / 5 * environmentHealth) -1 || temp.heightInArray > (int)(_height - _height / 5 * environmentHealth) +1)
+                    {
+                        temp.setTerrain(hexTile2.biomes.GLACIER);
+                    }
+                }
+                if (temp.isFrozen)
+                {
+                    int notFrozenNeighbors = 0;
+                    for (int k = 0; k < temp.counter; k++)
+                    {
+                        hexTile2 tempNeighbor = temp.neighbors[k].GetComponent<hexTile2>();
+                        if (tempNeighbor.isOcean && !tempNeighbor.isFrozen)
+                        {
+                            notFrozenNeighbors++;
+                        }
+                    }
+                    if (notFrozenNeighbors == 3 || notFrozenNeighbors == 4)
+                    {
+                        temp.setTerrain(hexTile2.biomes.ICEBERG);
+                    }
+                    if (notFrozenNeighbors >= 5)
+                    {
+                        temp.setTerrain(hexTile2.biomes.OCEAN);
+                    }
+                    
+                }
+                if (temp.isOcean && !temp.isFrozen && (temp.heightInArray < (int)(_height / 5 * (environmentHealth) - 2) || temp.heightInArray > (int)(_height - _height / 5 * (environmentHealth) + 2)))
+                {
+                    temp.setTerrain(hexTile2.biomes.GLACIER);
+                }
             }
         }
     }
@@ -725,46 +893,36 @@ public class gridManager : MonoBehaviour {
     void genBiome(GameObject start, hexTile2.biomes biome)
     {
         hexTile2 temp = start.GetComponent<hexTile2>();
-        if (!checkBiomeLocation(temp, biome))
+        if (isRealistic)
         {
-            return;
-        }
-        if (biome == hexTile2.biomes.DESERT || biome == hexTile2.biomes.TUNDRA || biome == hexTile2.biomes.FOREST)
-        {
-            acceptableX.Remove(temp.widthInArray);
+            if (!checkBiomeLocation(temp, biome))
+            {
+                return;
+            }
+            if (biome == hexTile2.biomes.DESERT || biome == hexTile2.biomes.TUNDRA || biome == hexTile2.biomes.FOREST)
+            {
+                acceptableX.Remove(temp.widthInArray);
+            }
         }
         temp.setTerrain(biome);
         biomeNums[(int)biome - 1]++;
         temp.isChecked = true;
         biomeSizeHolder.Add(temp);
-        GameObject[] acceptableNeighbors = new GameObject[6];
-        int neighborNum = 0;
+        List<GameObject> acceptableNeighbors = new List<GameObject>();
         for(int i = 0; i < temp.counter; i++)
         {
             if(!temp.neighbors[i].GetComponent<hexTile2>().isChecked && !temp.neighbors[i].GetComponent<hexTile2>().isOcean)
             {
-                acceptableNeighbors[neighborNum] = temp.neighbors[i];
-                neighborNum ++;
+                acceptableNeighbors.Add(temp.neighbors[i]);
             }
         }
-        int numTurning = Random.Range(0, neighborNum);
+        int numTurning = Random.Range(0, acceptableNeighbors.Count);
         if (numTurning != 0)
         {
-            bool[] selectedNeighbors = new bool[6];
-            for (int k = 0; k < 6; k++)
-            {
-                selectedNeighbors[k] = false;
-            }
             for (int i = 0; i < numTurning; i++)
             {
-                int neighbor = 0;
-                do
-                {
-                    neighbor = Random.Range(0, neighborNum);
-                }
-                while (selectedNeighbors[neighbor] == true);
+                int neighbor = Random.Range(0, acceptableNeighbors.Count - 1);
 
-                selectedNeighbors[neighbor] = true;
                 if (biomeNums[(int)biome-1] == tileBiomeNum || biomeSizeHolder.Count >= 10)
                 {
                     return;

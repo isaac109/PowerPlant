@@ -3,6 +3,8 @@ using System.Collections;
 
 public class cameraControl : MonoBehaviour {
 
+    public bool overGUI = false;
+
     private Vector3 dragOrigin;
     Vector3 pos = Vector3.zero;
 
