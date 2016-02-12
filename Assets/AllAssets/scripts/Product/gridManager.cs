@@ -2,11 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class gridManager : MonoBehaviour {
 
     public GameObject testInfoHolder;
     public GameObject hex;
+    public GameObject manager;
     public bool done = false;
     static int _height = 30;
     static int _width = 60;
@@ -17,8 +20,7 @@ public class gridManager : MonoBehaviour {
     int minLandSeeds = 5;
     int maxLandSeeds = 10;
     int percentModifier = 5;
-    float percentCity = .025f;
-    int cityNum = 0;
+    int cityNum = 42;
     int cityCounter = 0;
     public List<GameObject> land;
     int landCounter = 0;
@@ -61,7 +63,7 @@ public class gridManager : MonoBehaviour {
     }
 
     bool isTest = false;
-    bool isRealistic = true;
+    bool isRealistic = false;
 
     public List<biomeTile> biomeTileLists = new List<biomeTile>();
     public class biomeTile
@@ -105,7 +107,6 @@ public class gridManager : MonoBehaviour {
         }
         maxHeight = tiles[_width - 1][_height - 1].transform.position.z;
         maxWidth = tiles[_width - 1][_height - 1].transform.position.x;
-        cityNum = (int)((float)(_width * _height)*(float)(percentCity));
         cwidth = _height;
         cMaxHeight = maxHeight;
         cMaxWidth = maxWidth;
@@ -139,6 +140,7 @@ public class gridManager : MonoBehaviour {
             setPolarCaps();
             collectBiomes();
             modifyPolarCap();
+            startGame();
             if (isTest)
             {
                 if (testInfoHolder.GetComponent<testInfo>().itterationNum < testInfoHolder.GetComponent<testInfo>().maxItteration)
@@ -253,41 +255,78 @@ public class gridManager : MonoBehaviour {
     }
     void setCitys()
     {
+        List<hexTile2> acceptableTiles = new List<hexTile2>();
         for (int i = 0; i < _width; i++)
         {
             for (int j = 0; j < _height; j++)
             {
-                hexTile2 temp = tiles[i][j].GetComponent<hexTile2>();
                 bool hasMod = false;
-                bool hasNeighborCity = false;
-                for( int k = 0; k < temp.modifierTypes.Length; k++)
+                for (int k = 0; k < tiles[i][j].GetComponent<hexTile2>().modifierTypes.Length; k++)
                 {
-                    if(temp.modifierTypes[k] == true)
+                    if (tiles[i][j].GetComponent<hexTile2>().modifierTypes[k] == true)
                     {
                         hasMod = true;
                     }
                 }
-                for (int k = 0; k < temp.counter; k++)
+                if (tiles[i][j].GetComponent<hexTile2>().isLand && !hasMod)
                 {
-                    if (temp.neighbors[k].GetComponent<hexTile2>().hasCity == true)
-                    {
-                        hasNeighborCity = true;
-                    }
-                }
-                if (!temp.hasCity && cityCounter < cityNum && !temp.isOcean && !hasMod && !hasNeighborCity)
-                {
-                    int r = Random.Range(0, 99);
-                    if (r <= percentCity*100)
-                    {
-                        temp.setCity(true);
-                        cityCounter++;
-                    }
+                    acceptableTiles.Add(tiles[i][j].GetComponent<hexTile2>());
                 }
             }
         }
-        if (cityCounter < cityNum)
+        int numMaxPop = (int)((float)cityNum * .1);
+        int counterMax = 0;
+        int numMedPop = (int)((float)cityNum * .4);
+        int counterMed = 0;
+        int numMinPop = (int)((float)cityNum * .5);
+        int counterMin = 0;
+        int[] biomeCities = new int[8];
+        int maxBiomeCityNum = (int)((float)cityNum * .125)+1;
+        int biome = 0;
+        while (cityCounter < cityNum || acceptableTiles.Count == 0)
         {
-            setCitys();
+            int x = Random.Range(0, acceptableTiles.Count - 1);
+            bool hasCityNeightbor = false;
+            for (int i = 0; i < acceptableTiles[x].counter; i++)
+            {
+                if (acceptableTiles[x].neighbors[i].GetComponent<hexTile2>().hasCity)
+                {
+                    hasCityNeightbor = true;
+                }
+            }
+            bool biomeFull = false;
+            for (int i = 0; i < acceptableTiles[x].biomeTypes.Length; i++)
+            {
+                if (acceptableTiles[x].biomeTypes[i] == true)
+                {
+                    biome = i;
+                    if (biomeCities[i] >= maxBiomeCityNum)
+                    {
+                        biomeFull = true;
+                    }
+                }
+            }
+            if (hasCityNeightbor || biomeFull)
+            {
+                acceptableTiles.RemoveAt(x);
+                continue;
+            }
+            biomeCities[biome]++;
+            cityCounter++;
+            acceptableTiles[x].setCity(true);
+            if(counterMax <= numMaxPop)
+            {
+                acceptableTiles[x].population = Random.Range(900000,9000000);
+            }
+            else if (counterMed <= numMedPop)
+            {
+                acceptableTiles[x].population = Random.Range(300000, 900000);
+            }
+            else if (counterMin <= numMinPop)
+            {
+                acceptableTiles[x].population = Random.Range(100000, 300000);
+            }
+            acceptableTiles.RemoveAt(x);
         }
     }
     void setModifiers()
@@ -1124,6 +1163,40 @@ public class gridManager : MonoBehaviour {
                 break;
             }
         }
+    }
+
+    void startGame()
+    {
+        ExecuteEvents.Execute<IPointerClickHandler>(this.GetComponent<keyListener>().menus[9].GetComponent<updateTileUI>().buttons[6].gameObject, new PointerEventData(EventSystem.current), ExecuteEvents.pointerClickHandler);
+        this.GetComponent<keyListener>().toggleMenu(0);
+
+
+        List <GameObject> cities = new List<GameObject>();
+        cities = getCities();
+        List<IStatusEntity> cityEntities = new List<IStatusEntity>();
+        foreach (GameObject item in cities)
+        {
+            CityStatusEntity cse = new CityStatusEntity();
+            cse.population = item.GetComponent<hexTile2>().population;
+            cse.powerStatus = 0;
+            cityEntities.Add(cse);
+        }
+        ResearchDevelopmentStatusEntity rdse = new ResearchDevelopmentStatusEntity();
+        rdse.listOfPowerPlantUpgrades = new List<IStatusEntity>();
+        for (int i = 0; i < 10; i++)
+        {
+            PowerPlantUpgradeStatusEntity ppuse = new PowerPlantUpgradeStatusEntity();
+            ppuse.researchState = 0;
+            ppuse.listOfUpgrades = new List<IStatusEntity>();
+            for (int j = 0; j < 5; j++)
+            {
+                ResearchDevelopmentUpgradeStatusEntity rduse = new ResearchDevelopmentUpgradeStatusEntity();
+                rduse.researchState = 0;
+                ppuse.listOfUpgrades.Add(rduse);
+            }
+            rdse.listOfPowerPlantUpgrades.Add(ppuse);
+        }
+        manager.GetComponent<GameManager>().StartGame(cityEntities, rdse);
     }
 
     public List<GameObject> getCities()

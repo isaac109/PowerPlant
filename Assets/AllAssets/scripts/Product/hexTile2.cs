@@ -4,8 +4,8 @@ using System.Collections;
 
 public class hexTile2 : MonoBehaviour {
 
-    public GameObject canvas;
     public GameObject tileUI;
+    public Button leaveTileUI;
     public GameObject[] borders = new GameObject[6];
     public GameObject modLayer;
     public GameObject buildingLayer;
@@ -37,6 +37,9 @@ public class hexTile2 : MonoBehaviour {
     
     public bool isCoast = false;
     public bool hasCity = false;
+    public double population = 0;
+
+    public bool hasPowerPlant = false;
 
     public bool isChecked = false;
     public bool isMouseOver = false;
@@ -81,7 +84,6 @@ public class hexTile2 : MonoBehaviour {
     }
 	// Use this for initialization
 	void Start () {
-        canvas = GameObject.Find("Hud");
         tileUI = GameObject.Find("tileUI");
         this.gameObject.tag = "Tile";
         for (int i = 0; i < borders.Length; i++)
@@ -126,21 +128,48 @@ public class hexTile2 : MonoBehaviour {
 	}
     public void zoom()
     {
-        canvas.SetActive(false);
-        if (mainCamera.GetComponent<cameraControl>().currTile != null)
+        /*if (mainCamera.GetComponent<cameraControl>().currTile != null)
         {
             mainCamera.GetComponent<cameraControl>().currTile.GetComponent<hexManagement>().close();
-        }
+        }*/
         menuCamera.enabled = true;
         mainCamera.rect = new Rect(0f, .5f, 1f, 2f);
         cameraDistance = mainCamera.gameObject.transform.position.y;
         mainCamera.GetComponent<cameraControl>().cameraDistance = 20;
         mainCamera.gameObject.transform.position = new Vector3(this.transform.position.x, 20, this.transform.position.z);
-        this.GetComponent<hexManagement>().show = true;
+        gm.GetComponent<keyListener>().toggleMenu(9) ;
         isSelected = true;
         mainCamera.GetComponent<cameraControl>().canControl = false;
-        mainCamera.GetComponent<cameraControl>().currTile = this.gameObject;
+        mainCamera.GetComponent<cameraControl>().currTile = this.gameObject;    
+        updateUI();
     }
+
+    public void updateUI()
+    {
+        tileUI.GetComponent<updateTileUI>().tile = this;
+        tileUI.GetComponent<updateTileUI>().toggleViews(-1);
+        if (hasCity)
+        {
+            tileUI.GetComponent<updateTileUI>().updateButtons(1);
+        }
+        else if (hasPowerPlant)
+        {
+            tileUI.GetComponent<updateTileUI>().updateButtons(2);
+        }
+        else if(!hasPowerPlant && !isOcean)
+        {
+            tileUI.GetComponent<updateTileUI>().updateButtons(0);
+        }
+        else if (!hasPowerPlant && isCoast)
+        {
+            tileUI.GetComponent<updateTileUI>().updateButtons(0);
+        }
+        else if (isOcean)
+        {
+            tileUI.GetComponent<updateTileUI>().updateButtons(-1);
+        }
+    }
+
     public void setTerrain(biomes biome)
     {
         isOcean = false;
@@ -292,14 +321,14 @@ public class hexTile2 : MonoBehaviour {
     public void closeCameras()
     {
         menuCamera.enabled = false;
-        mainCamera.rect = new Rect(0f, 0f, 1f, 1f);
+        
         this.GetComponent<hexManagement>().show = false;
         isSelected = false;
         mainCamera.GetComponent<cameraControl>().cameraDistance = mainCamera.GetComponent<cameraControl>().tempCameradistance;
         //mainCamera.GetComponent<cameraControl>().tempCameradistance = 0;
         mainCamera.GetComponent<cameraControl>().canControl = true;
         mainCamera.GetComponent<cameraControl>().currTile = null;
-        canvas.SetActive(true);
+        mainCamera.rect = new Rect(0f, 0f, 1f, 1f);
         OnMouseExit();
     }
     public void removeScript()

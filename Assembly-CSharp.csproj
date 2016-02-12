@@ -70,11 +70,15 @@
      <Compile Include="Assets\AllAssets\scripts\Product\mapMaker\mapMakerTile.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\menu\buttinMoveInfo.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\menu\clickAndDrag.cs" />
+     <Compile Include="Assets\AllAssets\scripts\Product\menu\closeTileUI.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\menu\initializeSizeLocation.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\menu\keyListener.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\menu\menuResize.cs" />
+     <Compile Include="Assets\AllAssets\scripts\Product\menu\ppManager.cs" />
+     <Compile Include="Assets\AllAssets\scripts\Product\menu\ppPlacement.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\menu\scrollViewButtons.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\menu\showHideButtons.cs" />
+     <Compile Include="Assets\AllAssets\scripts\Product\menu\updateTileUI.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\mockHex.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\testInfo.cs" />
      <Compile Include="Assets\AllAssets\scripts\StatusEntities\BaseStatusEntity.cs" />

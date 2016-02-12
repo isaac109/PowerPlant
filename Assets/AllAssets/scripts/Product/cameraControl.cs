@@ -37,7 +37,7 @@ public class cameraControl : MonoBehaviour {
 	void Update () {
         if (canControl)
         {
-            if (Input.GetMouseButton(1))
+            if (Input.GetMouseButton(1) && !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
             {
                 RaycastHit hit;
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);

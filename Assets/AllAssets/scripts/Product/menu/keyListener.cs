@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class keyListener : MonoBehaviour {
 
     public List<GameObject> menus = new List<GameObject>();
+    public List<scrollViewButtons> scrollViews = new List<scrollViewButtons>();
     bool hIsPress = false;
     bool escIsPress = false;
 
@@ -17,20 +18,7 @@ public class keyListener : MonoBehaviour {
 	void Update () {
         if(Input.GetKeyUp(KeyCode.Escape))
         {
-            if (escIsPress)
-            {
-                toggleMenu(0);
-                if (hIsPress)
-                {
-                    hIsPress = false;
-                }
-                escIsPress = false;
-            }
-            else
-            {
-                toggleMenu(1);
-                escIsPress = true;
-            }
+            escPress();
         }
         if (Input.GetKeyUp(KeyCode.H) && !escIsPress)
         {
@@ -49,9 +37,30 @@ public class keyListener : MonoBehaviour {
         }
 	}
 
+    public void escPress()
+    {
+        if (escIsPress)
+        {
+            toggleMenu(0);
+            if (hIsPress)
+            {
+                hIsPress = false;
+            }
+            escIsPress = false;
+        }
+        else
+        {
+            toggleMenu(1);
+            escIsPress = true;
+        }
+    }
+
     public void toggleMenu(int j)
     {
-        Debug.Log(j);
+        foreach (scrollViewButtons item in scrollViews)
+        {
+            item.destroyButtons();
+        }
         for (int i = 0; i < menus.Count; i++)
         {
             if (i == j)
