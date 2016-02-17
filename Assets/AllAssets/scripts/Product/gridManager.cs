@@ -314,18 +314,20 @@ public class gridManager : MonoBehaviour {
             biomeCities[biome]++;
             cityCounter++;
             acceptableTiles[x].setCity(true);
+            acceptableTiles[x].gameObject.AddComponent<cityHexManager>();
             if(counterMax <= numMaxPop)
             {
-                acceptableTiles[x].population = Random.Range(900000,9000000);
+                acceptableTiles[x].GetComponent<cityHexManager>().population = Random.Range(900000,9000000);
             }
             else if (counterMed <= numMedPop)
             {
-                acceptableTiles[x].population = Random.Range(300000, 900000);
+                acceptableTiles[x].GetComponent<cityHexManager>().population = Random.Range(300000, 900000);
             }
             else if (counterMin <= numMinPop)
             {
-                acceptableTiles[x].population = Random.Range(100000, 300000);
+                acceptableTiles[x].GetComponent<cityHexManager>().population = Random.Range(100000, 300000);
             }
+            acceptableTiles[x].GetComponent<cityHexManager>().cityName = acceptableTiles[x].gameObject.name;
             acceptableTiles.RemoveAt(x);
         }
     }
@@ -1177,7 +1179,7 @@ public class gridManager : MonoBehaviour {
         foreach (GameObject item in cities)
         {
             CityStatusEntity cse = new CityStatusEntity();
-            cse.population = item.GetComponent<hexTile2>().population;
+            cse.population = item.GetComponent<cityHexManager>().population;
             cse.powerStatus = 0;
             cityEntities.Add(cse);
         }
@@ -1213,6 +1215,37 @@ public class gridManager : MonoBehaviour {
             }
         }
         return cities;
+    }
+    public List<GameObject> getCitiesInRange(int x, int y, int range)
+    {
+        List<GameObject> cities = new List<GameObject>();
+        Collider[] hitColliders = Physics.OverlapSphere(tiles[x][y].transform.position, (float)(10 * range));
+        foreach (Collider item in hitColliders)
+        {
+            if (item.gameObject.GetComponent<hexTile2>())
+            {
+                if (item.gameObject.GetComponent<hexTile2>().hasCity)
+                {
+                    cities.Add(item.gameObject);
+                }
+            }
+        }
+        return cities;
+    }
+    public List<GameObject> getPPs()
+    {
+        List<GameObject> pps = new List<GameObject>();
+        for (int i = 0; i < _width; i++)
+        {
+            for (int j = 0; j < _height; j++)
+            {
+                if (tiles[i][j].GetComponent<hexTile2>().hasPowerPlant)
+                {
+                    pps.Add(tiles[i][j]);
+                }
+            }
+        }
+        return pps;
     }
     public void zoom(int i, int j)
     {

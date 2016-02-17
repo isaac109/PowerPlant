@@ -37,8 +37,6 @@ public class hexTile2 : MonoBehaviour {
     
     public bool isCoast = false;
     public bool hasCity = false;
-    public double population = 0;
-
     public bool hasPowerPlant = false;
 
     public bool isChecked = false;
@@ -335,4 +333,5 @@ public class hexTile2 : MonoBehaviour {
     {
         Destroy(this);
     }
+
 }

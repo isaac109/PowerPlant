@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -69,14 +70,11 @@ public class updateTileUI : MonoBehaviour {
         {
             item.SetActive(false);
         }
-        switch (i)
+        if(i != -1)
         {
-            case 0:
-                scrollViews[i].SetActive(true);
-                break;
+            scrollViews[i].SetActive(true);
         }
     }
-
     public void cloaseCameras()
     {
         tile.closeCameras();

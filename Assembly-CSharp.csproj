@@ -59,6 +59,8 @@
      <Compile Include="Assets\AllAssets\scripts\Product\buttonBrancher.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\buttonFader.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\cameraControl.cs" />
+     <Compile Include="Assets\AllAssets\scripts\Product\cityHexManager.cs" />
+     <Compile Include="Assets\AllAssets\scripts\Product\gameInfoManager.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\gridManager.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\hexManagement.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\hexTile2.cs" />
@@ -69,6 +71,7 @@
      <Compile Include="Assets\AllAssets\scripts\Product\mapMaker\mapMakerManager.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\mapMaker\mapMakerTile.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\menu\buttinMoveInfo.cs" />
+     <Compile Include="Assets\AllAssets\scripts\Product\menu\citySliderUpdate.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\menu\clickAndDrag.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\menu\closeTileUI.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\menu\initializeSizeLocation.cs" />
@@ -76,10 +79,15 @@
      <Compile Include="Assets\AllAssets\scripts\Product\menu\menuResize.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\menu\ppManager.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\menu\ppPlacement.cs" />
+     <Compile Include="Assets\AllAssets\scripts\Product\menu\rndMenuManager.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\menu\scrollViewButtons.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\menu\showHideButtons.cs" />
+     <Compile Include="Assets\AllAssets\scripts\Product\menu\sliderValueDisplay.cs" />
+     <Compile Include="Assets\AllAssets\scripts\Product\menu\updateCheckbox.cs" />
+     <Compile Include="Assets\AllAssets\scripts\Product\menu\updateSlider.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\menu\updateTileUI.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\mockHex.cs" />
+     <Compile Include="Assets\AllAssets\scripts\Product\ppHexManager.cs" />
      <Compile Include="Assets\AllAssets\scripts\Product\testInfo.cs" />
      <Compile Include="Assets\AllAssets\scripts\StatusEntities\BaseStatusEntity.cs" />
      <Compile Include="Assets\AllAssets\scripts\StatusEntities\CityPowerStatusEntity.cs" />
