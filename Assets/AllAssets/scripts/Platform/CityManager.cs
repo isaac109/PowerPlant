@@ -27,7 +27,6 @@ public class CityManager : BaseManager {
             worldPopulation += cse.population;
             if (cse.mayor == null)
             {
-                cse.mayor.politicalPartyList.Add(0);//b
                 cse.mayor.politicalPartyList.Add(1);//o
                 cse.mayor.politicalPartyList.Add(2);//y
                 cse.mayor.politicalPartyList.Add(3);//d

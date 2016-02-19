@@ -260,15 +260,7 @@ public class gridManager : MonoBehaviour {
         {
             for (int j = 0; j < _height; j++)
             {
-                bool hasMod = false;
-                for (int k = 0; k < tiles[i][j].GetComponent<hexTile2>().modifierTypes.Length; k++)
-                {
-                    if (tiles[i][j].GetComponent<hexTile2>().modifierTypes[k] == true)
-                    {
-                        hasMod = true;
-                    }
-                }
-                if (tiles[i][j].GetComponent<hexTile2>().isLand && !hasMod)
+                if (tiles[i][j].GetComponent<hexTile2>().isLand && tiles[i][j].GetComponent<hexTile2>().mod == hexTile2.modifiers.NONE)
                 {
                     acceptableTiles.Add(tiles[i][j].GetComponent<hexTile2>());
                 }
@@ -295,16 +287,64 @@ public class gridManager : MonoBehaviour {
                 }
             }
             bool biomeFull = false;
-            for (int i = 0; i < acceptableTiles[x].biomeTypes.Length; i++)
+            switch(acceptableTiles[x].biome)
             {
-                if (acceptableTiles[x].biomeTypes[i] == true)
-                {
-                    biome = i;
-                    if (biomeCities[i] >= maxBiomeCityNum)
+                case hexTile2.biomes.MOUNTAIN:
+                    biome = 0;
+                    if (biomeCities[biome] >= maxBiomeCityNum)
                     {
                         biomeFull = true;
                     }
-                }
+                    break;
+                case hexTile2.biomes.DESERT:
+                    biome = 1;
+                    if (biomeCities[biome] >= maxBiomeCityNum)
+                    {
+                        biomeFull = true;
+                    }
+                    break;
+                case hexTile2.biomes.PLAINS:
+                    biome = 2;
+                    if (biomeCities[biome] >= maxBiomeCityNum)
+                    {
+                        biomeFull = true;
+                    }
+                    break;
+                case hexTile2.biomes.VALLEY:
+                    biome = 3;
+                    if (biomeCities[biome] >= maxBiomeCityNum)
+                    {
+                        biomeFull = true;
+                    }
+                    break;
+                case hexTile2.biomes.HILLS:
+                    biome = 4;
+                    if (biomeCities[biome] >= maxBiomeCityNum)
+                    {
+                        biomeFull = true;
+                    }
+                    break;
+                case hexTile2.biomes.MARSHES:
+                    biome = 5;
+                    if (biomeCities[biome] >= maxBiomeCityNum)
+                    {
+                        biomeFull = true;
+                    }
+                    break;
+                case hexTile2.biomes.FOREST:
+                    biome = 6;
+                    if (biomeCities[biome] >= maxBiomeCityNum)
+                    {
+                        biomeFull = true;
+                    }
+                    break;
+                case hexTile2.biomes.TUNDRA:
+                    biome = 7;
+                    if (biomeCities[biome] >= maxBiomeCityNum)
+                    {
+                        biomeFull = true;
+                    }
+                    break;
             }
             if (hasCityNeightbor || biomeFull)
             {
@@ -348,35 +388,35 @@ public class gridManager : MonoBehaviour {
                     }
                     else if (r <= 3 * percentModifier)
                     {
-                        if (mod == 1 && temp.modifierTypes[mod - 1])
+                        if (mod == 1 && temp.mod == hexTile2.modifiers.VOLCANO)
                         {
                             temp.setModifier((hexTile2.modifiers)mod, true);
                         }
-                        if (mod == 2 && temp.modifierTypes[mod - 1])
+                        if (mod == 2 && temp.mod == hexTile2.modifiers.HOT_SPOT)
                         {
                             temp.setModifier((hexTile2.modifiers)mod, true);
                         }
-                        if (mod == 3 && temp.modifierTypes[mod - 1])
+                        if (mod == 3 && temp.mod == hexTile2.modifiers.HIGH_WIND)
                         {
                             temp.setModifier((hexTile2.modifiers)mod, true);
                         }
-                        if (mod == 4 && temp.modifierTypes[mod - 1])
+                        if (mod == 4 && temp.mod == hexTile2.modifiers.RIVER)
                         {
                             temp.setModifier((hexTile2.modifiers)mod, true);
                         }
-                        if (mod == 5 && temp.modifierTypes[mod - 1])
+                        if (mod == 5 && temp.mod == hexTile2.modifiers.EARTHQUAKE)
                         {
                             temp.setModifier((hexTile2.modifiers)mod, true);
                         }
-                        if (mod == 6 && temp.modifierTypes[mod - 1])
+                        if (mod == 6 && temp.mod == hexTile2.modifiers.NATURAL_GAS)
                         {
                             temp.setModifier((hexTile2.modifiers)mod, true);
                         }
-                        if (mod == 7 && temp.modifierTypes[mod - 1])
+                        if (mod == 7 && temp.mod == hexTile2.modifiers.DENSE_TREES)
                         {
                             temp.setModifier((hexTile2.modifiers)mod, true);
                         }
-                        if (mod == 8 && temp.modifierTypes[mod - 1])
+                        if (mod == 8 && temp.mod == hexTile2.modifiers.COAL)
                         {
                             temp.setModifier((hexTile2.modifiers)mod, true);
                         }
@@ -544,12 +584,32 @@ public class gridManager : MonoBehaviour {
             {
                 if (tiles[i][j].GetComponent<hexTile2>().isLand)
                 {
-                    for (int k = 0; k < tiles[i][j].GetComponent<hexTile2>().biomeTypes.Length; k++)
+                    switch(tiles[i][j].GetComponent<hexTile2>().biome)
                     {
-                        if (tiles[i][j].GetComponent<hexTile2>().biomeTypes[k] == true)
-                        {
-                            biomeTileLists[k].tiles.Add(tiles[i][j].GetComponent<hexTile2>());
-                        }
+                        case hexTile2.biomes.MOUNTAIN:
+                            biomeTileLists[0].tiles.Add(tiles[i][j].GetComponent<hexTile2>());
+                            break;
+                        case hexTile2.biomes.DESERT:
+                            biomeTileLists[1].tiles.Add(tiles[i][j].GetComponent<hexTile2>());
+                            break;
+                        case hexTile2.biomes.PLAINS:
+                            biomeTileLists[2].tiles.Add(tiles[i][j].GetComponent<hexTile2>());
+                            break;
+                        case hexTile2.biomes.VALLEY:
+                            biomeTileLists[3].tiles.Add(tiles[i][j].GetComponent<hexTile2>());
+                            break;
+                        case hexTile2.biomes.HILLS:
+                            biomeTileLists[4].tiles.Add(tiles[i][j].GetComponent<hexTile2>());
+                            break;
+                        case hexTile2.biomes.MARSHES:
+                            biomeTileLists[5].tiles.Add(tiles[i][j].GetComponent<hexTile2>());
+                            break;
+                        case hexTile2.biomes.FOREST:
+                            biomeTileLists[6].tiles.Add(tiles[i][j].GetComponent<hexTile2>());
+                            break;
+                        case hexTile2.biomes.TUNDRA:
+                            biomeTileLists[7].tiles.Add(tiles[i][j].GetComponent<hexTile2>());
+                            break;
                     }
                 }
             }
@@ -633,51 +693,46 @@ public class gridManager : MonoBehaviour {
         hexTile2 temp = tile.GetComponent<hexTile2>();
         for (int i = 0; i < temp.counter; i++)
         {
-            if (temp.neighbors[i].GetComponent<hexTile2>().biomeTypes[0])
+            switch(temp.neighbors[i].GetComponent<hexTile2>().biome)
             {
-                numOfMou++;
-            }
-            if (temp.neighbors[i].GetComponent<hexTile2>().biomeTypes[1])
-            {
-                numOfDes++;
-            }
-            if (temp.neighbors[i].GetComponent<hexTile2>().biomeTypes[2])
-            {
-                numOfPla++;
-            }
-            if (temp.neighbors[i].GetComponent<hexTile2>().biomeTypes[3])
-            {
-                numOfVal++;
-            }
-            if (temp.neighbors[i].GetComponent<hexTile2>().biomeTypes[4])
-            {
-                numOfHil++;
-            }
-            if (temp.neighbors[i].GetComponent<hexTile2>().biomeTypes[5])
-            {
-                numOfMar++;
-            }
-            if (temp.neighbors[i].GetComponent<hexTile2>().biomeTypes[6])
-            {
-                numOfFor++;
-            }
-            if (temp.neighbors[i].GetComponent<hexTile2>().biomeTypes[7])
-            {
-                numOfTun++;
+                case hexTile2.biomes.MOUNTAIN:
+                    numOfMou++;
+                    break;
+                case hexTile2.biomes.DESERT:
+                    numOfDes++;
+                    break;
+                case hexTile2.biomes.PLAINS:
+                    numOfPla++;
+                    break;
+                case hexTile2.biomes.VALLEY:
+                    numOfVal++;
+                    break;
+                case hexTile2.biomes.HILLS:
+                    numOfHil++;
+                    break;
+                case hexTile2.biomes.MARSHES:
+                    numOfMar++;
+                    break;
+                case hexTile2.biomes.FOREST:
+                    numOfFor++;
+                    break;
+                case hexTile2.biomes.TUNDRA:
+                    numOfTun++;
+                    break;
             }
         }
         if (numOfMou + numOfDes + numOfPla + numOfVal + numOfHil + numOfMar + numOfFor + numOfTun == 0)
         {
             temp.setTerrain(hexTile2.biomes.OCEAN);
         }
-        if ((temp.biomeTypes[0] && numOfMou == 0) ||
-            (temp.biomeTypes[1] && numOfDes == 0) ||
-            (temp.biomeTypes[2] && numOfPla == 0) ||
-            (temp.biomeTypes[3] && numOfVal == 0) ||
-            (temp.biomeTypes[4] && numOfHil == 0) ||
-            (temp.biomeTypes[5] && numOfMar == 0) ||
-            (temp.biomeTypes[6] && numOfFor == 0) ||
-            (temp.biomeTypes[7] && numOfTun == 0))
+        if ((temp.biome == hexTile2.biomes.MOUNTAIN && numOfMou == 0) ||
+            (temp.biome == hexTile2.biomes.DESERT && numOfDes == 0) ||
+            (temp.biome == hexTile2.biomes.PLAINS && numOfPla == 0) ||
+            (temp.biome == hexTile2.biomes.VALLEY && numOfVal == 0) ||
+            (temp.biome == hexTile2.biomes.HILLS && numOfHil == 0) ||
+            (temp.biome == hexTile2.biomes.MARSHES && numOfMar == 0) ||
+            (temp.biome == hexTile2.biomes.FOREST && numOfFor == 0) ||
+            (temp.biome == hexTile2.biomes.TUNDRA && numOfTun == 0))
         {
             int num = Random.Range(1,(numOfMou+numOfDes+numOfPla+numOfVal+numOfHil+numOfMar+numOfFor+numOfTun+1));
             if (num <= numOfMou)
@@ -960,7 +1015,11 @@ public class gridManager : MonoBehaviour {
                 notFullBiomes.Add(i);
             }
         }
-        int biome = Random.Range(0, notFullBiomes.Count);
+        if (notFullBiomes.Count == 0)
+        {
+            return;
+        }
+        int biome = Random.Range(0, notFullBiomes.Count);       
         biome = notFullBiomes[biome];
         switch (biome)
         {

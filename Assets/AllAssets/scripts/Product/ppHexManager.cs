@@ -10,6 +10,7 @@ public class ppHexManager : MonoBehaviour {
     public int powerPrice = 0;
     public List<GameObject> citiesInRange = new List<GameObject>();
     public List<Slider> citiesSliders = new List<Slider>();
+    public List<bool> upgrades = new List<bool>();
     public Plants plant;
 
     public enum Plants
@@ -28,7 +29,11 @@ public class ppHexManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	
+
+        for (int i = 0; i < 5; i++)
+        {
+            upgrades.Add(false);
+        }
 	}
 	
 	// Update is called once per frame

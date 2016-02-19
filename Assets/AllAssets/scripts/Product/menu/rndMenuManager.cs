@@ -27,7 +27,7 @@ public class rndMenuManager : MonoBehaviour {
                 plants.Add(item.gameObject);
             }
             if (item.tag == "R&DUpgrades")
-            {
+            { 
                 plantUpgrades temp = new plantUpgrades();
                 temp.parent = item.gameObject;
                 foreach (Transform item2 in item.transform)
@@ -36,6 +36,14 @@ public class rndMenuManager : MonoBehaviour {
                 }
                 temp.parent.SetActive(false);
                 plantUpgradesList.Add(temp);
+            }
+        }
+        for (int i = 0; i < plantUpgradesList.Count; i++)
+        {
+            for (int j = 0; j < plantUpgradesList[i].plantUpgradeList.Count; j++)
+            {
+                int[] arr = {i,j};
+                plantUpgradesList[i].plantUpgradeList[j].GetComponent<Button>().onClick.AddListener(() => newUpgrade(arr));
             }
         }
 	}
@@ -55,6 +63,10 @@ public class rndMenuManager : MonoBehaviour {
     {
         gameInfoManager.GetComponent<gameInfoManager>().ownedPlants[i] = true;
     }
+    public void newUpgrade(int[] arr)
+    {
+        gameInfoManager.GetComponent<gameInfoManager>().ownedUpgrades[arr[0]].ups[arr[1]] = true;
+    }
 
     public void updateButtons()
     {
@@ -67,6 +79,22 @@ public class rndMenuManager : MonoBehaviour {
                 plants[i].transform.Find("CostSet").gameObject.SetActive(false);
                 plants[i].transform.Find("State").GetComponent<Text>().text = "OWNED";
                 plantUpgradesList[i].parent.SetActive(true);
+            }
+        }
+        for (int i = 0; i < plantUpgradesList.Count; i++)
+        {
+            if (plantUpgradesList[i].parent.activeSelf)
+            {
+                for (int j = 0; j < plantUpgradesList[i].plantUpgradeList.Count; j++)
+                {
+                    if (gameInfoManager.GetComponent<gameInfoManager>().ownedUpgrades[i].ups[j])
+                    {
+                        plantUpgradesList[i].plantUpgradeList[j].GetComponent<Button>().interactable = false;
+                        plantUpgradesList[i].plantUpgradeList[j].transform.Find("Cost").gameObject.SetActive(false);
+                        plantUpgradesList[i].plantUpgradeList[j].transform.Find("CostSet").gameObject.SetActive(false);
+                        plantUpgradesList[i].plantUpgradeList[j].transform.Find("State").GetComponent<Text>().text = "OWNED";
+                    }
+                }
             }
         }
     }

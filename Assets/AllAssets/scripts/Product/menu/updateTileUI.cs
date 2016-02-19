@@ -29,9 +29,12 @@ public class updateTileUI : MonoBehaviour {
         }
         foreach (GameObject item in scrollViews)
         {
-            if (item.GetComponentInChildren<scrollViewButtons>().instantiatedButtons.Count != 0)
+            if (item.GetComponentInChildren<scrollViewButtons>())
             {
-                item.GetComponentInChildren<scrollViewButtons>().destroyButtons();
+                if (item.GetComponentInChildren<scrollViewButtons>().instantiatedButtons.Count != 0)
+                {
+                    item.GetComponentInChildren<scrollViewButtons>().destroyButtons();
+                }
             }
         }
         switch (i)

@@ -8,6 +8,10 @@ public class cameraControl : MonoBehaviour {
     private Vector3 dragOrigin;
     Vector3 pos = Vector3.zero;
 
+    float cameraSize = 100f;
+    float maxCameraSize = 200f;
+    float minCameraSize = 20f;
+
     float cameraDistanceMax = 260f;
     float cameraDistanceMin = 20f;
     float cameraWidthMax = 0;
@@ -28,6 +32,8 @@ public class cameraControl : MonoBehaviour {
         {
         }
         this.transform.position = new Vector3(gm.cMaxWidth/2, this.transform.position.y, gm.cMaxHeight/2);
+        maxCameraSize = ((float)gm.cwidth * (8f + (2.0f / 3.0f)) + 5) * (30f / 53f);
+        cameraSize = maxCameraSize;
         cameraDistanceMax = (float)gm.cwidth * (8f+(2.0f/3.0f)) + 5;
         cameraDistance = cameraDistanceMax;
 	
@@ -63,6 +69,10 @@ public class cameraControl : MonoBehaviour {
             }
             if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
             {
+                /*cameraSize -= Input.GetAxis("Mouse ScrollWheel") * scrollSpeed;
+                cameraSize = Mathf.Clamp(cameraSize, minCameraSize, maxCameraSize);
+                this.GetComponent<Camera>().orthographicSize = cameraSize;*/
+
                 cameraDistance -= Input.GetAxis("Mouse ScrollWheel") * scrollSpeed;
                 cameraDistance = Mathf.Clamp(cameraDistance, cameraDistanceMin, cameraDistanceMax);
                 this.transform.position = new Vector3(this.transform.position.x, cameraDistance, this.transform.position.z);
