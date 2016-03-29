@@ -9,9 +9,12 @@ public class ppHexManager : MonoBehaviour {
     public int powerRange = 0;
     public int powerPrice = 0;
     public List<GameObject> citiesInRange = new List<GameObject>();
+    public List<int> cityPower = new List<int>();
     public List<Slider> citiesSliders = new List<Slider>();
     public List<bool> upgrades = new List<bool>();
     public Plants plant;
+    public int buildStartTurn = 1;
+    public bool built = false;
 
     public enum Plants
     {
@@ -47,10 +50,13 @@ public class ppHexManager : MonoBehaviour {
             this.gameObject.GetComponent<hexTile2>().widthInArray,
             this.gameObject.GetComponent<hexTile2>().heightInArray,
             powerRange);
-        foreach (GameObject item in citiesInRange)
-        {
-            item.GetComponent<cityHexManager>().powerRec = maxPowerOutput / citiesInRange.Count;
-        }
+        for (int i = 0; i < citiesInRange.Count; i++)
+		{
+            int power =  maxPowerOutput / citiesInRange.Count;
+			citiesInRange[i].GetComponent<cityHexManager>().powerRec += power;
+            cityPower.Add(power);
+	    }
+            
     }
 
 
@@ -71,25 +77,105 @@ public class ppHexManager : MonoBehaviour {
         }
     }
 
-    public void updateCurrentPowerOutput()
+    public void initializeSliders()
+    {
+        for (int i = 0; i < citiesSliders.Count; i++)
+        {
+            citiesSliders[i].value = cityPower[i];
+        }
+    }
+
+    public void updateCurrentPowerOutput(int position)
     {
         removeSliders();
+        if (position == -1)
+        {
+            return;
+        }
         foreach (Slider item in citiesSliders)
         {
-            int max = maxPowerOutput;
+            item.gameObject.GetComponent<citySliderUpdate>().updateCity(item.value, item.value);
+        }
+        int total = 0;
+        if (citiesSliders.Count > 1)
+        {
+            foreach (Slider item in citiesSliders)
+            {
+                total += (int)item.value;
+            }
+            if (total > maxPowerOutput)
+            {
+                total -= maxPowerOutput;
+                total /= (citiesSliders.Count - 1);
+                for (int i = 0; i < citiesSliders.Count; i++)
+                {
+                    if (i != position)
+                    {
+                        citiesSliders[i].value -= total;
+                        citiesSliders[i].gameObject.GetComponent<citySliderUpdate>().updateCity(cityPower[i], citiesSliders[i].value);
+                        cityPower[i] = (int)citiesSliders[i].value;
+                    }
+                }
+            }
+            
+        }
+        citiesSliders[position].gameObject.GetComponent<citySliderUpdate>().updateCity(cityPower[position], citiesSliders[position].value);
+        cityPower[position] = (int)citiesSliders[position].value;
+        
+
+        /*foreach (Slider item in citiesSliders)
+        {
+            int total = 0;
             if (citiesSliders.Count > 1)
             {
                 foreach (Slider item2 in citiesSliders)
                 {
-                    if (item2 != item)
+                    total += (int)item2.value;
+                }
+                if (total > maxPowerOutput)
+                {
+                    total -= (int)item.value;
+                    total /= (citiesSliders.Count - 1);
+                    foreach (Slider item3 in citiesSliders)
                     {
-                        max -= (int)item2.value;
+                        item3.value = total;
+                        item3.gameObject.GetComponent<citySliderUpdate>().updateCity(item3.value);
                     }
                 }
             }
-            item.maxValue = max;
             
             item.gameObject.GetComponent<citySliderUpdate>().updateCity(item.value);
+        }*/
+    }
+
+    public int getPowerConsumption()
+    {
+        switch (plant)
+        {
+            case Plants.COAL:
+                return 1;
+            case Plants.GAS:
+                return 2;
+            default:
+                return 0;
         }
+    }
+    public int getPowerOutput()
+    {
+        int output = 0;
+        foreach (GameObject item in citiesInRange)
+        {
+            output += (int)item.GetComponent<cityHexManager>().powerRec;
+        }
+        return output;
+    }
+    public int getPotantialIncome()
+    {
+        int money = 0;
+        foreach (int item in cityPower)
+        {
+            money += (item *1000 * 1000 * powerPrice / 100);
+        }
+        return money;
     }
 }

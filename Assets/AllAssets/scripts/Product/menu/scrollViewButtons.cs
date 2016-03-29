@@ -124,9 +124,9 @@ public class scrollViewButtons : MonoBehaviour {
             temp.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
             temp.GetComponent<RectTransform>().localRotation = Quaternion.Euler(0, 0, 0);
             temp.GetComponent<Slider>().maxValue = upTile.tile.GetComponent<ppHexManager>().maxPowerOutput;
+            temp.GetComponent<citySliderUpdate>().position = i;
             temp.GetComponent<citySliderUpdate>().tile = upTile.tile.GetComponent<ppHexManager>();
             temp.GetComponent<citySliderUpdate>().cityTile = citiesInRange[i];
-            temp.GetComponent<Slider>().value = citiesInRange[i].GetComponent<cityHexManager>().powerRec;
             if(!upTile.tile.GetComponent<ppHexManager>().citiesSliders.Contains(temp.GetComponent<Slider>()))
             {
                 upTile.tile.GetComponent<ppHexManager>().citiesSliders.Add(temp.GetComponent<Slider>());
@@ -141,7 +141,8 @@ public class scrollViewButtons : MonoBehaviour {
             }
             instantiatedButtons.Add(temp);
         }
-        upTile.tile.GetComponent<ppHexManager>().updateCurrentPowerOutput();
+        upTile.tile.GetComponent<ppHexManager>().updateCurrentPowerOutput(-1);
+        upTile.tile.GetComponent<ppHexManager>().initializeSliders();
         this.GetComponent<RectTransform>().sizeDelta = new Vector2(0, (citiesInRange.Count + 1) * 30);
 
     }

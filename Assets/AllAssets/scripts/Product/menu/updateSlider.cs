@@ -23,9 +23,15 @@ public class updateSlider : MonoBehaviour {
         price.text = "$" + this.GetComponent<Slider>().value.ToString();
     }
 
+    public void getCurrentPrice()
+    {
+        this.GetComponent<Slider>().value = tileUI.tile.GetComponent<ppHexManager>().powerPrice;
+        updateKWH(this.GetComponent<Slider>().value);
+    }
+
     public void updateKWH(float value)
     {
-        price.text = "$" + value.ToString();
+        price.text = "$0." + value.ToString();
         tileUI.tile.GetComponent<ppHexManager>().powerPrice = (int)value;
     }
 }

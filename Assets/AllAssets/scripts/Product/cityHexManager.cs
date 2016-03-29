@@ -7,6 +7,7 @@ public class cityHexManager : MonoBehaviour {
     public string cityName = "";
     public float powerRec = 0;
 
+
 	// Use this for initialization
 	void Start () {
 	
@@ -16,4 +17,21 @@ public class cityHexManager : MonoBehaviour {
 	void Update () {
 	
 	}
+
+    public int getPwrLvl()
+    {
+        if (powerRec >= population)
+        {
+            return 2;//powered
+        }
+        else if (powerRec == 0)
+        {
+            return 0;//not powered
+        }
+        else
+        {
+            return 1;//under powered
+        }
+    }
+
 }

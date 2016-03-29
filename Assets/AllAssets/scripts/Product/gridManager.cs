@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
@@ -10,6 +11,16 @@ public class gridManager : MonoBehaviour {
     public GameObject testInfoHolder;
     public GameObject hex;
     public GameObject manager;
+    public GameObject gameInfoManager;
+    public Text enviroHealth;
+    public Text popularity;
+    public Text playerWealth;
+    public Text income;
+    public Text output;
+    public Text citiesPowered;
+    public Text nextElections;
+    public Text time;
+    public Text turnNum;
     public bool done = false;
     static int _height = 30;
     static int _width = 60;
@@ -73,9 +84,19 @@ public class gridManager : MonoBehaviour {
     List<int> biomesToChangeCount = new List<int>();
 
 	void Start () {
-        Random.seed = (int)System.DateTime.Now.Ticks;
+        UnityEngine.Random.seed = (int)System.DateTime.Now.Ticks;
         maxAllOceanNum = (int)(((float)(_height * _width) * (1 - percentLand)) - ((float)(_height * _width) * (1 - percentLand)) / 3 + ((float)(_height * _width) * (1 - percentLand)) / 18);
         testInfoHolder = GameObject.Find("testInfoHolder");
+        gameInfoManager = GameObject.Find("gameInfoManager");
+        enviroHealth = GameObject.Find("Environment").transform.FindChild("Text").GetComponent<Text>();
+        popularity = GameObject.Find("popularity").transform.FindChild("Text").GetComponent<Text>();
+        playerWealth = GameObject.Find("Money").transform.FindChild("Text").GetComponent<Text>();
+        income = GameObject.Find("income").transform.FindChild("Text").GetComponent<Text>();
+        output = GameObject.Find("output").transform.FindChild("Text").GetComponent<Text>();
+        citiesPowered = GameObject.Find("cityInfo").transform.FindChild("Text").GetComponent<Text>();
+        nextElections = GameObject.Find("tillElection").transform.FindChild("Text").GetComponent<Text>();
+        time = GameObject.Find("Time").transform.FindChild("Text").GetComponent<Text>();
+        turnNum = GameObject.Find("Turn#").transform.FindChild("Text").GetComponent<Text>();
         landMasses = new List<continents>();
         foreach (int i in biomeNums)
         {
@@ -153,14 +174,164 @@ public class gridManager : MonoBehaviour {
                 }
             }
         }
+        enviroHealth.text = gameInfoManager.GetComponent<gameInfoManager>().environmentHealth.ToString();
+        popularity.text = gameInfoManager.GetComponent<gameInfoManager>().percentHappiness.ToString();
+        playerWealth.text = "Money: $"+gameInfoManager.GetComponent<gameInfoManager>().playerWealth.ToString();
+        List<GameObject> pps = getPPs();
+        int incomeInt = 0;
+        foreach (GameObject item in pps)
+        {
+            incomeInt += item.GetComponent<ppHexManager>().getPotantialIncome();
+        }
+        income.text = "income: $" + incomeInt.ToString();
+        int power = 0;
+        foreach (GameObject item in pps)
+        {
+            power += item.GetComponent<ppHexManager>().getPowerOutput();
+        }
+        output.text = "output: " + power.ToString() + "W";
+        int not = 0;
+        int under = 0;
+        int powered = 0;
+        List<GameObject> cities = getCities();
+        foreach (GameObject item in cities)
+        {
+            switch (item.GetComponent<cityHexManager>().getPwrLvl())
+            {
+                case 0:
+                    not++;
+                    break;
+                case 1:
+                    under++;
+                    break;
+                case 2:
+                    powered++;
+                    break;
+            }
+        }
+        citiesPowered.text = not.ToString()+"/" + under.ToString() + "/" + powered.ToString();
+        int turnTill = 0;
+        if (gameInfoManager.GetComponent<gameInfoManager>().turnNum < 8)
+        {
+            turnTill = 8 - gameInfoManager.GetComponent<gameInfoManager>().turnNum;
+        }
+        else
+        {
+            turnTill = 8 - (gameInfoManager.GetComponent<gameInfoManager>().turnNum % 8);
+        }
+        nextElections.text = "Next election: " + turnTill.ToString();
+        time.text = DateTime.Now.Hour.ToString() + ":" + DateTime.Now.Minute.ToString(); 
+        turnNum.text = gameInfoManager.GetComponent<gameInfoManager>().turnNum.ToString();
         
 	}
     public void nextTurn()
     {
-        environmentHealth -= .1f;
+        /*environmentHealth -= .1f;
         modifyPolarCap();
         //moveInCoasts();
-        alterBiomes();
+        alterBiomes();*/
+        List<IStatusEntity> cityList = new List<IStatusEntity>();
+        List<GameObject> cities = getCities();
+        foreach (GameObject item in cities)
+        {
+            CityStatusEntity cse = new CityStatusEntity();
+            cse.powerStatus = item.GetComponent<cityHexManager>().getPwrLvl();
+            cityList.Add(cse);
+        }
+
+        ResearchDevelopmentStatusEntity rdse = new ResearchDevelopmentStatusEntity();
+        for (int i = 0; i < 10; i++)
+        {
+            PowerPlantUpgradeStatusEntity ppuse = new PowerPlantUpgradeStatusEntity();
+            if (gameInfoManager.GetComponent<gameInfoManager>().researchedPlants[i])
+            {
+                ppuse.researchStartTurn = gameInfoManager.GetComponent<gameInfoManager>().turnNum;
+                ppuse.researchState = 2;
+                gameInfoManager.GetComponent<gameInfoManager>().researchedPlants[i] = false;
+            }
+            for (int j = 0; j < 5; j++)
+            {
+                ResearchDevelopmentUpgradeStatusEntity rduse = new ResearchDevelopmentUpgradeStatusEntity();
+                if (gameInfoManager.GetComponent<gameInfoManager>().researchedUpgrades[i].ups[j])
+                {
+                    rduse.researchStartTurn = gameInfoManager.GetComponent<gameInfoManager>().turnNum;
+                    rduse.researchState = 2;
+                    gameInfoManager.GetComponent<gameInfoManager>().researchedUpgrades[i].ups[j] = false;
+                }
+                ppuse.listOfUpgrades.Add(rduse);
+            }
+            rdse.listOfPowerPlantUpgrades.Add(ppuse);
+            
+        }
+
+        LegislationStatusEntity legse = new LegislationStatusEntity();
+        List<IStatusEntity> powerP = new List<IStatusEntity>();
+        List<GameObject> powerPlants = getPPs();
+        foreach (GameObject item in powerPlants)
+        {
+            PowerPlantStatusEntity ppse = new PowerPlantStatusEntity();
+            ppse.resourceDrain = new ResourceDrainStatusEntity();
+            ppse.resourceDrain.resourceType = item.GetComponent<ppHexManager>().getPowerConsumption();
+            ppse.typeOfPowerPlant = (int)item.GetComponent<ppHexManager>().plant;
+            ppse.powerCostPerTurn = item.GetComponent<ppHexManager>().powerPrice;
+            ppse.powerOutput = item.GetComponent<ppHexManager>().getPowerOutput();
+            ppse.buildStartTurn = item.GetComponent<ppHexManager>().buildStartTurn;
+            //TODO: ppse.citiespowered
+            powerP.Add(ppse);
+        }
+
+        manager.GetComponent<GameManager>().UpdateGameState(cityList, rdse, legse, powerP);
+        List<List<IStatusEntity>> updateGameLists = manager.GetComponent<GameManager>().GetGameState();
+
+        /* 
+         * UpdateGamelist[0]; list of citystatusentities, length can vary
+         * UpdateGamelist[1]; List of environmentstatusentity, length of 1
+         * UpdateGamelist[2]; List of financestatusentity, length of 1
+         * UpdateGamelist[3]; List of legislationstatusentity, length of 1 DEATH
+         * UpdateGamelist[4]; List of popularitystatusentity, length of 1
+         * UpdateGamelist[5]; List of powerplantstatusentity, length can vary
+         * UpdateGamelist[6]; List of researchdevelopmentstatusentity, length of 1
+         * UpdateGamelist[7]; List of resourcestatusentity, length of 1
+        */
+
+        EnvironmentStatusEntity tempEn = (EnvironmentStatusEntity)updateGameLists[1][0];
+        gameInfoManager.GetComponent<gameInfoManager>().environmentHealth = tempEn.environmentHealth;
+        FinanceStatusEntity tempFi = (FinanceStatusEntity)updateGameLists[2][0];
+        gameInfoManager.GetComponent<gameInfoManager>().playerWealth = tempFi.playerWealth;
+        PopularityStatusEntity tempPo = (PopularityStatusEntity)updateGameLists[4][0];
+        gameInfoManager.GetComponent<gameInfoManager>().percentHappiness = tempPo.percentHappiness;
+        List<PowerPlantStatusEntity> tempPP = new List<PowerPlantStatusEntity>();
+        foreach (IStatusEntity item in updateGameLists[5])
+        {
+            tempPP.Add((PowerPlantStatusEntity)item);
+        }
+        for (int i = 0; i < tempPP.Count; i++)
+        {
+            powerPlants[i].GetComponent<ppHexManager>().built = tempPP[i].built;
+        }
+        ResearchDevelopmentStatusEntity tempRDSE = (ResearchDevelopmentStatusEntity)updateGameLists[6][0];
+        for (int i = 0; i < 10; i++)
+        {
+            PowerPlantUpgradeStatusEntity ppuse = (PowerPlantUpgradeStatusEntity)tempRDSE.listOfPowerPlantUpgrades[i];
+            if(ppuse.turnsToResearch == 0 && ppuse.researchState == 2)
+            {
+                gameInfoManager.GetComponent<gameInfoManager>().ownedPlants[i] = true;
+            }
+            for (int j = 0; j < 5; j++)
+            {
+                ResearchDevelopmentUpgradeStatusEntity rduse = (ResearchDevelopmentUpgradeStatusEntity)ppuse.listOfUpgrades[j];
+                if (rduse.turnsToResearch == 0 && rduse.researchState == 2)
+                {
+                    gameInfoManager.GetComponent<gameInfoManager>().ownedUpgrades[i].ups[j] = true;
+                }
+            }
+        }
+        ResourceStatusEntity tempResource = (ResourceStatusEntity)updateGameLists[7][0];
+        gameInfoManager.GetComponent<gameInfoManager>().coal = tempResource.coal;
+        gameInfoManager.GetComponent<gameInfoManager>().gas = tempResource.gas;
+
+        gameInfoManager.GetComponent<gameInfoManager>().turnNum++;
+
     }
     void checkOceanSize()
     {
@@ -220,23 +391,23 @@ public class gridManager : MonoBehaviour {
         int y;
         int heightRange = 5;
 
-        x = Random.Range(0, _width);
-        y = Random.Range(_height - heightRange, _height);
+        x = UnityEngine.Random.Range(0, _width);
+        y = UnityEngine.Random.Range(_height - heightRange, _height);
         seed(x, y);
 
-        x = Random.Range(0, _width);
-        y = Random.Range(0, heightRange);
+        x = UnityEngine.Random.Range(0, _width);
+        y = UnityEngine.Random.Range(0, heightRange);
         seed(x, y);
 
-        x = Random.Range(0, _width);
-        y = Random.Range(_height / 2 - heightRange / 2, _height / 2 + heightRange / 2);
+        x = UnityEngine.Random.Range(0, _width);
+        y = UnityEngine.Random.Range(_height / 2 - heightRange / 2, _height / 2 + heightRange / 2);
         seed(x, y);
 
-        int num = Random.Range(minLandSeeds, maxLandSeeds);
+        int num = UnityEngine.Random.Range(minLandSeeds, maxLandSeeds);
         while (landCounter < num)
         {
-            y = Random.Range(0, _height);
-            x = Random.Range(0, _width);
+            y = UnityEngine.Random.Range(0, _height);
+            x = UnityEngine.Random.Range(0, _width);
             seed(x,y);
         }
     }
@@ -277,7 +448,7 @@ public class gridManager : MonoBehaviour {
         int biome = 0;
         while (cityCounter < cityNum || acceptableTiles.Count == 0)
         {
-            int x = Random.Range(0, acceptableTiles.Count - 1);
+            int x = UnityEngine.Random.Range(0, acceptableTiles.Count - 1);
             bool hasCityNeightbor = false;
             for (int i = 0; i < acceptableTiles[x].counter; i++)
             {
@@ -353,21 +524,28 @@ public class gridManager : MonoBehaviour {
             }
             biomeCities[biome]++;
             cityCounter++;
-            acceptableTiles[x].setCity(true);
             acceptableTiles[x].gameObject.AddComponent<cityHexManager>();
+            int size = -1;
             if(counterMax <= numMaxPop)
             {
-                acceptableTiles[x].GetComponent<cityHexManager>().population = Random.Range(900000,9000000);
+                acceptableTiles[x].GetComponent<cityHexManager>().population = UnityEngine.Random.Range(900, 9000);
+                counterMax++;
+                size = 2;
             }
             else if (counterMed <= numMedPop)
             {
-                acceptableTiles[x].GetComponent<cityHexManager>().population = Random.Range(300000, 900000);
+                acceptableTiles[x].GetComponent<cityHexManager>().population = UnityEngine.Random.Range(300, 900);
+                counterMed++;
+                size = 1;
             }
             else if (counterMin <= numMinPop)
             {
-                acceptableTiles[x].GetComponent<cityHexManager>().population = Random.Range(100000, 300000);
+                acceptableTiles[x].GetComponent<cityHexManager>().population = UnityEngine.Random.Range(100, 300);
+                counterMin++;
+                size = 0;
             }
             acceptableTiles[x].GetComponent<cityHexManager>().cityName = acceptableTiles[x].gameObject.name;
+            acceptableTiles[x].setCity(true, size);
             acceptableTiles.RemoveAt(x);
         }
     }
@@ -380,8 +558,8 @@ public class gridManager : MonoBehaviour {
                 hexTile2 temp = tiles[i][j].GetComponent<hexTile2>();
                 if (!temp.isOcean)
                 {
-                    int mod = Random.Range(0, 8);
-                    int r = Random.Range(0, 100);
+                    int mod = UnityEngine.Random.Range(0, 8);
+                    int r = UnityEngine.Random.Range(0, 100);
                     if (r <= percentModifier)
                     {
                         temp.setModifier((hexTile2.modifiers)mod, true);
@@ -629,7 +807,7 @@ public class gridManager : MonoBehaviour {
                 {
                     if (biomeTileLists[i].tiles.Count != 0)
                     {
-                        int r = Random.Range(0, biomeTileLists[i].tiles.Count - 1);
+                        int r = UnityEngine.Random.Range(0, biomeTileLists[i].tiles.Count - 1);
                         biomeTileLists[i].tiles[r].isSunBleached = true;
                         biomeTileLists[i].tiles.RemoveAt(r);
                     }
@@ -672,7 +850,7 @@ public class gridManager : MonoBehaviour {
                     {
                         temp.setTerrain(hexTile2.biomes.OCEAN);
                         temp.setModifier(hexTile2.modifiers.COAL, false);
-                        temp.setCity(false);
+                        temp.setCity(false, -1);
                         temp.isCoast = true;
                     }
                 }
@@ -734,7 +912,7 @@ public class gridManager : MonoBehaviour {
             (temp.biome == hexTile2.biomes.FOREST && numOfFor == 0) ||
             (temp.biome == hexTile2.biomes.TUNDRA && numOfTun == 0))
         {
-            int num = Random.Range(1,(numOfMou+numOfDes+numOfPla+numOfVal+numOfHil+numOfMar+numOfFor+numOfTun+1));
+            int num = UnityEngine.Random.Range(1, (numOfMou + numOfDes + numOfPla + numOfVal + numOfHil + numOfMar + numOfFor + numOfTun + 1));
             if (num <= numOfMou)
             {
                 temp.setTerrain(hexTile2.biomes.MOUNTAIN);
@@ -789,8 +967,8 @@ public class gridManager : MonoBehaviour {
         }
         maxNumFrozenCaps = (int)(environmentHealth * percentFrozenCaps * polarWater.Count);
         while (numFrozenCaps < maxNumFrozenCaps)
-        {        
-            int i = Random.Range(0, polarWater.Count - 1);
+        {
+            int i = UnityEngine.Random.Range(0, polarWater.Count - 1);
             biomeSizeHolder = new List<hexTile2>();
             genPolarCaps(polarWater[i]);
         }
@@ -816,12 +994,12 @@ public class gridManager : MonoBehaviour {
                 acceptableNeighbors.Add(temp.neighbors[i]);
             }
         }
-        int numTurning = Random.Range(0, acceptableNeighbors.Count);
+        int numTurning = UnityEngine.Random.Range(0, acceptableNeighbors.Count);
         if (numTurning != 0)
         {
             for (int i = 0; i < numTurning; i++)
             {
-                int neighbor = Random.Range(0,acceptableNeighbors.Count-1);
+                int neighbor = UnityEngine.Random.Range(0, acceptableNeighbors.Count - 1);
                 polarWater.Remove(start);
                 genPolarCaps(acceptableNeighbors[neighbor]);
             }
@@ -902,7 +1080,7 @@ public class gridManager : MonoBehaviour {
         int counterMax = 500;
         while (biomeNums[1] < tileBiomeNum)
         {
-            int y = Random.Range(0, rangeOfDesert.Count);
+            int y = UnityEngine.Random.Range(0, rangeOfDesert.Count);
             y = rangeOfDesert[y];
             acceptableX = new List<int>();
             for (int i = 0; i < _width; i++)
@@ -917,7 +1095,7 @@ public class gridManager : MonoBehaviour {
                 rangeOfDesert.RemoveAt(y);
                 continue;
             }
-            int x = Random.Range(0, acceptableX.Count);
+            int x = UnityEngine.Random.Range(0, acceptableX.Count);
             x = acceptableX[x];
             if (tiles[x][y].GetComponent<hexTile2>().isLand && !tiles[x][y].GetComponent<hexTile2>().isChecked)
             {
@@ -932,7 +1110,7 @@ public class gridManager : MonoBehaviour {
         counter = 0;
         while (biomeNums[6] < tileBiomeNum)
         {
-            int y = Random.Range(0, rangeOfForest.Count);
+            int y = UnityEngine.Random.Range(0, rangeOfForest.Count);
             y = rangeOfForest[y];
             acceptableX = new List<int>();
             for (int i = 0; i < _width; i++)
@@ -947,7 +1125,7 @@ public class gridManager : MonoBehaviour {
                 rangeOfForest.RemoveAt(y);
                 continue;
             }
-            int x = Random.Range(0, acceptableX.Count);
+            int x = UnityEngine.Random.Range(0, acceptableX.Count);
             x = acceptableX[x];
             if (tiles[x][y].GetComponent<hexTile2>().isLand && !tiles[x][y].GetComponent<hexTile2>().isChecked)
             {
@@ -962,7 +1140,7 @@ public class gridManager : MonoBehaviour {
         counter = 0;
         while (biomeNums[7] < tileBiomeNum)
         {
-            int y = Random.Range(0, rangeOfTundra.Count-1);
+            int y = UnityEngine.Random.Range(0, rangeOfTundra.Count - 1);
             y = rangeOfTundra[y];
             acceptableX = new List<int>();
             for (int i = 0; i < _width; i++)
@@ -977,7 +1155,7 @@ public class gridManager : MonoBehaviour {
                 rangeOfTundra.RemoveAt(y);
                 continue;
             }
-            int x = Random.Range(0, acceptableX.Count - 1);
+            int x = UnityEngine.Random.Range(0, acceptableX.Count - 1);
             x = acceptableX[x];
             if (tiles[x][y].GetComponent<hexTile2>().isLand && !tiles[x][y].GetComponent<hexTile2>().isChecked)
             {
@@ -1019,7 +1197,7 @@ public class gridManager : MonoBehaviour {
         {
             return;
         }
-        int biome = Random.Range(0, notFullBiomes.Count);       
+        int biome = UnityEngine.Random.Range(0, notFullBiomes.Count);       
         biome = notFullBiomes[biome];
         switch (biome)
         {
@@ -1075,12 +1253,12 @@ public class gridManager : MonoBehaviour {
                 acceptableNeighbors.Add(temp.neighbors[i]);
             }
         }
-        int numTurning = Random.Range(0, acceptableNeighbors.Count);
+        int numTurning = UnityEngine.Random.Range(0, acceptableNeighbors.Count);
         if (numTurning != 0)
         {
             for (int i = 0; i < numTurning; i++)
             {
-                int neighbor = Random.Range(0, acceptableNeighbors.Count - 1);
+                int neighbor = UnityEngine.Random.Range(0, acceptableNeighbors.Count - 1);
 
                 if (biomeNums[(int)biome-1] == tileBiomeNum || biomeSizeHolder.Count >= 10)
                 {
@@ -1134,16 +1312,16 @@ public class gridManager : MonoBehaviour {
             {
                 neighbors.Add(temp.neighbors[j]);
             }
-            int num = Random.Range(0, neighbors.Count);
+            int num = UnityEngine.Random.Range(0, neighbors.Count);
             int counter = 0;
             while (counter < num)
             {
-                int selected = Random.Range(0, neighbors.Count);
+                int selected = UnityEngine.Random.Range(0, neighbors.Count);
                 bool neighborContinent = onOtherContinent(neighbors[selected], temp);
                 bool addIfNeighborContinent = true;
                 if (neighborContinent)
                 {
-                    int r = Random.Range(0, 100);
+                    int r = UnityEngine.Random.Range(0, 100);
                     if (r >= addNeighborChance)
                     {
                         addIfNeighborContinent = true;
@@ -1232,8 +1410,7 @@ public class gridManager : MonoBehaviour {
         this.GetComponent<keyListener>().toggleMenu(0);
 
 
-        List <GameObject> cities = new List<GameObject>();
-        cities = getCities();
+        List <GameObject> cities = getCities();
         List<IStatusEntity> cityEntities = new List<IStatusEntity>();
         foreach (GameObject item in cities)
         {
@@ -1247,7 +1424,14 @@ public class gridManager : MonoBehaviour {
         for (int i = 0; i < 10; i++)
         {
             PowerPlantUpgradeStatusEntity ppuse = new PowerPlantUpgradeStatusEntity();
-            ppuse.researchState = 0;
+            if (gameInfoManager.GetComponent<gameInfoManager>().ownedPlants[i])
+            {
+                ppuse.researchState = 2;
+            }
+            else
+            {
+                ppuse.researchState = 0;
+            }
             ppuse.listOfUpgrades = new List<IStatusEntity>();
             for (int j = 0; j < 5; j++)
             {

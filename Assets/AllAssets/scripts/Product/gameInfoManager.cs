@@ -6,7 +6,16 @@ public class gameInfoManager : MonoBehaviour {
 
     //geo, solar, wind, hydro, tectonic, gas, bio, coal, nuclear, tidal
     public List<bool> ownedPlants = new List<bool>();
+    public List<bool> researchedPlants = new List<bool>();
     public List<upgrades> ownedUpgrades = new List<upgrades>();
+    public List<upgrades> researchedUpgrades = new List<upgrades>();
+    public double environmentHealth = 100;
+    public double playerWealth = 100;
+    public double percentHappiness = 100;
+    public double coal = 100;
+    public double gas = 100;
+
+    public int turnNum = 1;
 
     public class upgrades
     {
@@ -18,12 +27,16 @@ public class gameInfoManager : MonoBehaviour {
         for (int i = 0; i < 10; i++)
         {
             ownedPlants.Add(false);
+            researchedPlants.Add(false);
             upgrades temp = new upgrades();
+            upgrades temp2 = new upgrades();
             for (int j = 0; j < 5; j++)
             {
                 temp.ups.Add(false);
+                temp2.ups.Add(false);
             }
             ownedUpgrades.Add(temp);
+            researchedUpgrades.Add(temp2);
         }
         DontDestroyOnLoad(this.gameObject);
 	}

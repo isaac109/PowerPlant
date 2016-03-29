@@ -14,7 +14,7 @@ public class sliderValueDisplay : MonoBehaviour {
         }
         else
         {
-            value.text = val.ToString();
+            value.text = (val * 1000).ToString();
         }
     }
 }

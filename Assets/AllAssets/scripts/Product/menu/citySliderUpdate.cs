@@ -4,6 +4,7 @@ using System.Collections;
 
 public class citySliderUpdate : MonoBehaviour {
 
+    public int position = 0;
     public ppHexManager tile;
     public GameObject cityTile;
 
@@ -18,10 +19,11 @@ public class citySliderUpdate : MonoBehaviour {
 	}
     public void updateMax(float value)
     {
-        tile.updateCurrentPowerOutput();      
+        tile.updateCurrentPowerOutput(position);      
     }
-    public void updateCity(float value)
+    public void updateCity(float initValue, float newValue)
     {
-        cityTile.GetComponent<cityHexManager>().powerRec = value;
+        cityTile.GetComponent<cityHexManager>().powerRec -= initValue;
+        cityTile.GetComponent<cityHexManager>().powerRec += newValue;
     }
 }

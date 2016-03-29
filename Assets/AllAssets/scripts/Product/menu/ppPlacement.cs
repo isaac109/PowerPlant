@@ -29,61 +29,61 @@ public class ppPlacement : MonoBehaviour {
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().powerPrice = 30;
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().powerRange = 2;
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().plant = ppHexManager.Plants.BIOMAS;
-                tileUI.tile.gameObject.GetComponent<ppHexManager>().maxPowerOutput = 30000;
+                tileUI.tile.gameObject.GetComponent<ppHexManager>().maxPowerOutput = 30;
                 break;
             case ppHexManager.Plants.COAL:
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().powerPrice = 30;
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().powerRange = 1;
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().plant = ppHexManager.Plants.COAL;
-                tileUI.tile.gameObject.GetComponent<ppHexManager>().maxPowerOutput = 30000;
+                tileUI.tile.gameObject.GetComponent<ppHexManager>().maxPowerOutput = 30;
                 break;
             case ppHexManager.Plants.GAS:
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().powerPrice = 30;
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().powerRange = 2;
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().plant = ppHexManager.Plants.GAS;
-                tileUI.tile.gameObject.GetComponent<ppHexManager>().maxPowerOutput = 30000;
+                tileUI.tile.gameObject.GetComponent<ppHexManager>().maxPowerOutput = 30;
                 break;
             case ppHexManager.Plants.GEOTHERMAL:
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().powerPrice = 30;
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().powerRange = 2;
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().plant = ppHexManager.Plants.GEOTHERMAL;
-                tileUI.tile.gameObject.GetComponent<ppHexManager>().maxPowerOutput = 30000;
+                tileUI.tile.gameObject.GetComponent<ppHexManager>().maxPowerOutput = 30;
                 break;
             case ppHexManager.Plants.HYDRO:
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().powerPrice = 30;
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().powerRange = 2;
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().plant = ppHexManager.Plants.HYDRO;
-                tileUI.tile.gameObject.GetComponent<ppHexManager>().maxPowerOutput = 30000;
+                tileUI.tile.gameObject.GetComponent<ppHexManager>().maxPowerOutput = 30;
                 break;
             case ppHexManager.Plants.NUCLEAR:
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().powerPrice = 30;
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().powerRange = 2;
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().plant = ppHexManager.Plants.NUCLEAR;
-                tileUI.tile.gameObject.GetComponent<ppHexManager>().maxPowerOutput = 30000;
+                tileUI.tile.gameObject.GetComponent<ppHexManager>().maxPowerOutput = 30;
                 break;
             case ppHexManager.Plants.SOLAR:
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().powerPrice = 30;
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().powerRange = 2;
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().plant = ppHexManager.Plants.SOLAR;
-                tileUI.tile.gameObject.GetComponent<ppHexManager>().maxPowerOutput = 30000;
+                tileUI.tile.gameObject.GetComponent<ppHexManager>().maxPowerOutput = 30;
                 break;
             case ppHexManager.Plants.TECTONIC:
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().powerPrice = 30;
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().powerRange = 2;
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().plant = ppHexManager.Plants.TECTONIC;
-                tileUI.tile.gameObject.GetComponent<ppHexManager>().maxPowerOutput = 30000;
+                tileUI.tile.gameObject.GetComponent<ppHexManager>().maxPowerOutput = 30;
                 break;
             case ppHexManager.Plants.TIDAL:
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().powerPrice = 30;
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().powerRange = 2;
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().plant = ppHexManager.Plants.TIDAL;
-                tileUI.tile.gameObject.GetComponent<ppHexManager>().maxPowerOutput = 30000;
+                tileUI.tile.gameObject.GetComponent<ppHexManager>().maxPowerOutput = 30;
                 break;
             case ppHexManager.Plants.WIND:
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().powerPrice = 30;
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().powerRange = 2;
                 tileUI.tile.gameObject.GetComponent<ppHexManager>().plant = ppHexManager.Plants.WIND;
-                tileUI.tile.gameObject.GetComponent<ppHexManager>().maxPowerOutput = 30000;
+                tileUI.tile.gameObject.GetComponent<ppHexManager>().maxPowerOutput = 30;
                 break;
         }
         tileUI.tile.gameObject.GetComponent<ppHexManager>().getCitiesInRange();

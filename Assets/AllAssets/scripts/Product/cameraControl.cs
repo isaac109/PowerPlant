@@ -8,7 +8,7 @@ public class cameraControl : MonoBehaviour {
     private Vector3 dragOrigin;
     Vector3 pos = Vector3.zero;
 
-    float cameraSize = 100f;
+    public float cameraSize = 100f;
     float maxCameraSize = 200f;
     float minCameraSize = 20f;
 
@@ -41,6 +41,7 @@ public class cameraControl : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        this.GetComponent<Camera>().orthographicSize = cameraSize;
         if (canControl)
         {
             if (Input.GetMouseButton(1) && !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
@@ -69,21 +70,20 @@ public class cameraControl : MonoBehaviour {
             }
             if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
             {
-                /*cameraSize -= Input.GetAxis("Mouse ScrollWheel") * scrollSpeed;
+                cameraSize -= Input.GetAxis("Mouse ScrollWheel") * scrollSpeed;
                 cameraSize = Mathf.Clamp(cameraSize, minCameraSize, maxCameraSize);
-                this.GetComponent<Camera>().orthographicSize = cameraSize;*/
 
-                cameraDistance -= Input.GetAxis("Mouse ScrollWheel") * scrollSpeed;
+                /*cameraDistance -= Input.GetAxis("Mouse ScrollWheel") * scrollSpeed;
                 cameraDistance = Mathf.Clamp(cameraDistance, cameraDistanceMin, cameraDistanceMax);
-                this.transform.position = new Vector3(this.transform.position.x, cameraDistance, this.transform.position.z);
+                this.transform.position = new Vector3(this.transform.position.x, cameraDistance, this.transform.position.z);*/
 
-                tempCameradistance = cameraDistance;
-                cameraWidthMax = (cameraDistance / cameraDistanceMax) * gm.cMaxWidth / 2;
-                cameraHeightMax = (cameraDistance / cameraDistanceMax) * gm.cMaxHeight / 2;
+                tempCameradistance = cameraSize;
+                cameraWidthMax = (cameraSize / maxCameraSize) * gm.cMaxWidth / 2;
+                cameraHeightMax = (cameraSize / maxCameraSize) * gm.cMaxHeight / 2;
                 float cBorderPercent = 0;
-                if ((cameraDistance / cameraDistanceMax) != 1)
+                if ((cameraSize / maxCameraSize) != 1)
                 {
-                    cBorderPercent = ((100f - ((cameraDistance / cameraDistanceMax) * 100)) / 100) * 6;
+                    cBorderPercent = ((100f - ((cameraSize / maxCameraSize) * 100)) / 100) * 6;
                 }
                 if (this.transform.position.x <= cameraWidthMax - cBorderPercent)
                 {
@@ -91,7 +91,7 @@ public class cameraControl : MonoBehaviour {
                 }
                 if (this.transform.position.x > gm.cMaxWidth - cameraWidthMax + cBorderPercent)
                 {
-                    this.transform.position = new Vector3(gm.cMaxWidth - cameraWidthMax + 5, this.transform.position.y, this.transform.position.z);
+                    this.transform.position = new Vector3(gm.cMaxWidth - cameraWidthMax + cBorderPercent, this.transform.position.y, this.transform.position.z);
                 }
                 if (this.transform.position.z < cameraHeightMax - cBorderPercent)
                 {

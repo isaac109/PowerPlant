@@ -24,7 +24,9 @@ public class hexTile2 : MonoBehaviour {
 
     public Material border;
 
-    public Material city;
+    public Material sCity;
+    public Material mCity;
+    public Material lCity;
 
     public bool isOcean = false;
     public bool isLand = false;
@@ -134,9 +136,9 @@ public class hexTile2 : MonoBehaviour {
         }*/
         menuCamera.enabled = true;
         mainCamera.rect = new Rect(0f, .5f, 1f, 2f);
-        cameraDistance = mainCamera.gameObject.transform.position.y;
-        mainCamera.GetComponent<cameraControl>().cameraDistance = 20;
-        mainCamera.gameObject.transform.position = new Vector3(this.transform.position.x, 20, this.transform.position.z);
+        cameraDistance = mainCamera.GetComponent<cameraControl>().cameraSize;
+        mainCamera.GetComponent<cameraControl>().cameraSize = 20;
+        mainCamera.gameObject.transform.position = new Vector3(this.transform.position.x, mainCamera.gameObject.transform.position.y, this.transform.position.z);
         gm.GetComponent<keyListener>().toggleMenu(9) ;
         isSelected = true;
         mainCamera.GetComponent<cameraControl>().canControl = false;
@@ -280,11 +282,22 @@ public class hexTile2 : MonoBehaviour {
             modLayer.SetActive(false);
         }
     }
-    public void setCity(bool set)
+    public void setCity(bool set, int size)
     {
         if (set)
         {
-            buildingLayer.GetComponent<Renderer>().material = city;
+            switch(size)
+            {
+                case 0:
+                    buildingLayer.GetComponent<Renderer>().material = sCity;
+                    break;
+                case 1:
+                    buildingLayer.GetComponent<Renderer>().material = mCity;
+                    break;
+                case 2:
+                    buildingLayer.GetComponent<Renderer>().material = lCity;
+                    break;
+            }
             buildingLayer.SetActive(true);
             hasCity = true;
         }
@@ -319,7 +332,7 @@ public class hexTile2 : MonoBehaviour {
         
         this.GetComponent<hexManagement>().show = false;
         isSelected = false;
-        mainCamera.GetComponent<cameraControl>().cameraDistance = mainCamera.GetComponent<cameraControl>().tempCameradistance;
+        mainCamera.GetComponent<cameraControl>().cameraSize = mainCamera.GetComponent<cameraControl>().tempCameradistance;
         //mainCamera.GetComponent<cameraControl>().tempCameradistance = 0;
         mainCamera.GetComponent<cameraControl>().canControl = true;
         mainCamera.GetComponent<cameraControl>().currTile = null;
