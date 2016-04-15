@@ -1,0 +1,133 @@
+fileFormatVersion: 2
+guid: ad8a1e53a99b5644f87307c83d5268e3
+timeCreated: 1457035967
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: menu bg 1 border_0
+    21300002: menu bg 1 border_1
+    21300004: menu bg 1 border_2
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -3
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: 1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 300, y: 300, z: 300, w: 300}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: menu bg 1 border_0
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 324
+        width: 1783
+        height: 1290
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 243, y: 243, z: 243, w: 243}
+      outline:
+      - - {x: 891.5, y: -645}
+        - {x: 891.5, y: 645}
+        - {x: -891.5, y: 645}
+        - {x: -891.5, y: -645}
+    - name: menu bg 1 border_1
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 1619
+        width: 1813
+        height: 261
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -645.5, y: 119.5}
+        - {x: -656.5, y: 130.5}
+        - {x: -798.5, y: 130.5}
+        - {x: -809.5, y: 119.5}
+        - {x: -809.5, y: 96.5}
+        - {x: -865.5, y: 96.5}
+        - {x: -877.5, y: 84.5}
+        - {x: -877.5, y: 29.5}
+        - {x: -899.5, y: 29.5}
+        - {x: -906.5, y: 22.5}
+        - {x: -906.5, y: -126.5}
+        - {x: -902.5, y: -130.5}
+        - {x: 906.5, y: -130.5}
+        - {x: 906.5, y: 84.5}
+        - {x: 894.5, y: 96.5}
+        - {x: -645.5, y: 96.5}
+    - name: menu bg 1 border_2
+      rect:
+        serializedVersion: 2
+        x: 63
+        y: 57
+        width: 1821
+        height: 270
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 812.5, y: -95}
+        - {x: 865.5, y: -95}
+        - {x: 877.5, y: -83}
+        - {x: 877.5, y: -32}
+        - {x: 901.5, y: -32}
+        - {x: 910.5, y: -23}
+        - {x: 910.5, y: 123}
+        - {x: 901.5, y: 132}
+        - {x: 877.5, y: 132}
+        - {x: 877.5, y: 135}
+        - {x: -906.5, y: 135}
+        - {x: -906.5, y: -83}
+        - {x: -894.5, y: -95}
+        - {x: 647.5, y: -95}
+        - {x: 647.5, y: -123}
+        - {x: 659.5, y: -135}
+        - {x: 705.5, y: -135}
+        - {x: 706.5, y: -134}
+        - {x: 800.5, y: -134}
+        - {x: 812.5, y: -122}
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

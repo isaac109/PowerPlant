@@ -1,0 +1,530 @@
+fileFormatVersion: 2
+guid: e12e423a69fa31848a64e7fc185bf4b6
+timeCreated: 1460672074
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName: {}
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -3
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: logo 2 v2 (1)_0
+      rect:
+        serializedVersion: 2
+        x: 102
+        y: 659
+        width: 786
+        height: 221
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_1
+      rect:
+        serializedVersion: 2
+        x: 169
+        y: 402
+        width: 176
+        height: 242
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_2
+      rect:
+        serializedVersion: 2
+        x: 404
+        y: 402
+        width: 176
+        height: 242
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_3
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 402
+        width: 176
+        height: 242
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_4
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_5
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_6
+      rect:
+        serializedVersion: 2
+        x: 94
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_7
+      rect:
+        serializedVersion: 2
+        x: 123
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_8
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_9
+      rect:
+        serializedVersion: 2
+        x: 180
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_10
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_11
+      rect:
+        serializedVersion: 2
+        x: 238
+        y: 351
+        width: 8
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_12
+      rect:
+        serializedVersion: 2
+        x: 249
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_13
+      rect:
+        serializedVersion: 2
+        x: 278
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_14
+      rect:
+        serializedVersion: 2
+        x: 318
+        y: 346
+        width: 5
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_15
+      rect:
+        serializedVersion: 2
+        x: 337
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_16
+      rect:
+        serializedVersion: 2
+        x: 366
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_17
+      rect:
+        serializedVersion: 2
+        x: 395
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_18
+      rect:
+        serializedVersion: 2
+        x: 424
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_19
+      rect:
+        serializedVersion: 2
+        x: 452
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_20
+      rect:
+        serializedVersion: 2
+        x: 481
+        y: 351
+        width: 29
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_21
+      rect:
+        serializedVersion: 2
+        x: 513
+        y: 351
+        width: 8
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_22
+      rect:
+        serializedVersion: 2
+        x: 524
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_23
+      rect:
+        serializedVersion: 2
+        x: 553
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_24
+      rect:
+        serializedVersion: 2
+        x: 581
+        y: 351
+        width: 8
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_25
+      rect:
+        serializedVersion: 2
+        x: 592
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_26
+      rect:
+        serializedVersion: 2
+        x: 621
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_27
+      rect:
+        serializedVersion: 2
+        x: 661
+        y: 346
+        width: 5
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_28
+      rect:
+        serializedVersion: 2
+        x: 680
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_29
+      rect:
+        serializedVersion: 2
+        x: 709
+        y: 351
+        width: 8
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_30
+      rect:
+        serializedVersion: 2
+        x: 720
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_31
+      rect:
+        serializedVersion: 2
+        x: 749
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_32
+      rect:
+        serializedVersion: 2
+        x: 778
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_33
+      rect:
+        serializedVersion: 2
+        x: 807
+        y: 351
+        width: 8
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_34
+      rect:
+        serializedVersion: 2
+        x: 817
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_35
+      rect:
+        serializedVersion: 2
+        x: 846
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_36
+      rect:
+        serializedVersion: 2
+        x: 875
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_37
+      rect:
+        serializedVersion: 2
+        x: 904
+        y: 351
+        width: 8
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_38
+      rect:
+        serializedVersion: 2
+        x: 915
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_39
+      rect:
+        serializedVersion: 2
+        x: 943
+        y: 351
+        width: 26
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_40
+      rect:
+        serializedVersion: 2
+        x: 102
+        y: 162
+        width: 786
+        height: 176
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_41
+      rect:
+        serializedVersion: 2
+        x: 434
+        y: 110
+        width: 128
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: logo 2 v2 (1)_42
+      rect:
+        serializedVersion: 2
+        x: 474
+        y: 67
+        width: 44
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
