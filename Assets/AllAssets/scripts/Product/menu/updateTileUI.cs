@@ -37,30 +37,39 @@ public class updateTileUI : MonoBehaviour {
                 }
             }
         }
+        Vector3 loc;
         switch (i)
         {
             case -1:
                 buttons[0].SetActive(true);
                 buttons[1].SetActive(true);
-                buttons[1].GetComponent<RectTransform>().localPosition = new Vector3(-453, 105, 0);
+                loc = buttons[0].transform.localPosition;
+                loc.y -= 30;
+                buttons[1].GetComponent<RectTransform>().localPosition = loc;//new Vector3(-453, 105, 0);
                 break;
             case 0:
                 buttons[0].SetActive(true);
                 buttons[1].SetActive(true);
-                buttons[1].GetComponent<RectTransform>().localPosition = new Vector3(-453, 75, 0);
+                loc = buttons[0].transform.localPosition;
+                loc.y -= 60;
+                buttons[1].GetComponent<RectTransform>().localPosition = loc;//new Vector3(-453, 75, 0);
                 buttons[6].SetActive(true);
                 break;
             case 1:
                 buttons[0].SetActive(true);
                 buttons[1].SetActive(true);
-                buttons[1].GetComponent<RectTransform>().localPosition = new Vector3(-453, 45, 0);
+                loc = buttons[0].transform.localPosition;
+                loc.y -= 90;
+                buttons[1].GetComponent<RectTransform>().localPosition = loc;//new Vector3(-453, 45, 0);
                 buttons[2].SetActive(true);
                 buttons[3].SetActive(true);
                 break;
             case 2:
                 buttons[0].SetActive(true);
                 buttons[1].SetActive(true);
-                buttons[1].GetComponent<RectTransform>().localPosition = new Vector3(-453, 45, 0);
+                loc = buttons[0].transform.localPosition;
+                loc.y -= 90;
+                buttons[1].GetComponent<RectTransform>().localPosition = loc;//new Vector3(-453, 45, 0);
                 buttons[4].SetActive(true);
                 buttons[5].SetActive(true);
                 break;

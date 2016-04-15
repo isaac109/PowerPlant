@@ -80,13 +80,45 @@ public class mapMakerChangeMenu : MonoBehaviour {
         }
     }
 
+    public void changeMod(mapMakerTile.modifiers mod)
+    {
+        for (int i = 0; i < tilesToChange.Count; i++)
+        {
+            tilesToChange[i].GetComponent<mapMakerTile>().setModifier(mod,true);
+        }
+    }
+
+    public void changeCity(mapMakerTile.cities size)
+    {
+        for (int i = 0; i < tilesToChange.Count; i++)
+        {
+            tilesToChange[i].GetComponent<mapMakerTile>().setCity(true, size);
+        }
+    }
+
     public void declineChanges()
     {
         for (int i = 0; i < tilesToChange.Count; i++)
         {
             tilesToChange[i].GetComponent<Renderer>().material = origionalMaterials[i];
             UnityEditorInternal.ComponentUtility.CopyComponent(origionalTiles[i].GetComponent<mapMakerTile>());
-            UnityEditorInternal.ComponentUtility.PasteComponentValues(tilesToChange[i].GetComponent<mapMakerTile>());           
+            UnityEditorInternal.ComponentUtility.PasteComponentValues(tilesToChange[i].GetComponent<mapMakerTile>());
+            if (origionalTiles[i].GetComponent<mapMakerTile>().mod == mapMakerTile.modifiers.NONE)
+            {
+                tilesToChange[i].GetComponent<mapMakerTile>().setModifier(mapMakerTile.modifiers.NONE, false);
+            }
+            else
+            {
+                tilesToChange[i].GetComponent<mapMakerTile>().setModifier(origionalTiles[i].GetComponent<mapMakerTile>().mod, true);
+            }
+            if (origionalTiles[i].GetComponent<mapMakerTile>().hasCity == mapMakerTile.cities.NONE)
+            {
+                tilesToChange[i].GetComponent<mapMakerTile>().setCity(false, mapMakerTile.cities.NONE);
+            }
+            else
+            {
+                tilesToChange[i].GetComponent<mapMakerTile>().setCity(true, origionalTiles[i].GetComponent<mapMakerTile>().hasCity);
+            }
         }
     }
 

@@ -21,19 +21,22 @@ public class mapMakerTile : MonoBehaviour {
 
     public Material border;
 
-    public Material city;
+    public Material sCity;
+    public Material mCity;
+    public Material lCity;
 
     public bool isOcean = false;
     public bool isLand = false;
     public bool isFrozen = false;
 
     //isMountain, isDesert, isPlains, isValley, isHills, isMarshes, isForest, isTundra
-    public bool[] biomeTypes = { false, false, false, false, false, false, false, false };
+    public biomes biome = biomes.NONE;
     //hasVolcano, hasHotSpot, hasHighWinds, hasRiver, hasEarthquake, hasNaturalGas, hasDenseTrees, hasCoal
-    public bool[] modifierTypes = { false, false, false, false, false, false, false, false };
+    public modifiers mod = modifiers.NONE;
 
     public bool isCoast = false;
-    public bool hasCity = false;
+    public cities hasCity = cities.NONE;
+
 
     public bool isChecked = false;
     public bool isMouseOver = false;
@@ -58,7 +61,8 @@ public class mapMakerTile : MonoBehaviour {
         FOREST,
         TUNDRA,
         GLACIER,
-        ICEBERG
+        ICEBERG,
+        NONE
     }
 
     public enum modifiers
@@ -70,7 +74,15 @@ public class mapMakerTile : MonoBehaviour {
         EARTHQUAKE,
         NATURAL_GAS,
         DENSE_TREES,
-        COAL
+        COAL,
+        NONE
+    }
+    public enum cities
+    {
+        SMALL,
+        MEDIUM,
+        LARGE,
+        NONE
     }
     // Use this for initialization
     void Start()
@@ -137,59 +149,49 @@ public class mapMakerTile : MonoBehaviour {
             canBeChanged = true;
         }
     }
-    public void setTerrain(biomes biome)
+    public void setTerrain(biomes b)
     {
         isOcean = false;
         isFrozen = false;
-        for (int j = 0; j < biomeTypes.Length; j++)
-        {
-            biomeTypes[j] = false;
-        }
-        switch (biome)
+        biome = biomes.NONE;
+        switch (b)
         {
             case biomes.OCEAN:
                 this.GetComponent<Renderer>().material = baseTiles[0];
                 isOcean = true;
+                biome = biomes.OCEAN;
                 break;
             case biomes.MOUNTAIN:
                 this.GetComponent<Renderer>().material = baseTiles[1];
-                biomeTypes[0] = true;
-                isLand = true;
+                biome = biomes.MOUNTAIN;
                 break;
             case biomes.DESERT:
                 this.GetComponent<Renderer>().material = baseTiles[2];
-                biomeTypes[1] = true;
-                isLand = true;
+                biome = biomes.DESERT;
                 break;
             case biomes.PLAINS:
                 this.GetComponent<Renderer>().material = baseTiles[3];
-                biomeTypes[2] = true;
-                isLand = true;
+                biome = biomes.PLAINS;
                 break;
             case biomes.VALLEY:
                 this.GetComponent<Renderer>().material = baseTiles[4];
-                biomeTypes[3] = true;
-                isLand = true;
+                biome = biomes.VALLEY;
                 break;
             case biomes.HILLS:
                 this.GetComponent<Renderer>().material = baseTiles[5];
-                biomeTypes[4] = true;
-                isLand = true;
+                biome = biomes.HILLS;
                 break;
             case biomes.MARSHES:
                 this.GetComponent<Renderer>().material = baseTiles[6];
-                biomeTypes[5] = true;
-                isLand = true;
+                biome = biomes.MARSHES;
                 break;
             case biomes.FOREST:
                 this.GetComponent<Renderer>().material = baseTiles[7];
-                biomeTypes[6] = true;
-                isLand = true;
+                biome = biomes.FOREST;
                 break;
             case biomes.TUNDRA:
                 this.GetComponent<Renderer>().material = baseTiles[8];
-                biomeTypes[7] = true;
-                isLand = true;
+                biome = biomes.TUNDRA;
                 break;
             case biomes.GLACIER:
                 this.GetComponent<Renderer>().material = baseTiles[9];
@@ -210,47 +212,44 @@ public class mapMakerTile : MonoBehaviour {
         Destroy(this);
     }
 
-    public void setModifier(modifiers mod, bool set)
+    public void setModifier(modifiers m, bool set)
     {
-        for (int j = 0; j < modifierTypes.Length; j++)
-        {
-            modifierTypes[j] = false;
-        }
+        mod = modifiers.NONE;
         if (set)
         {
-            switch (mod)
+            switch (m)
             {
                 case modifiers.VOLCANO:
                     modLayer.GetComponent<Renderer>().material = modTiles[0];
-                    modifierTypes[0] = true;
+                    mod = modifiers.VOLCANO;
                     break;
                 case modifiers.HOT_SPOT:
                     modLayer.GetComponent<Renderer>().material = modTiles[1];
-                    modifierTypes[1] = true;
+                    mod = modifiers.HOT_SPOT;
                     break;
                 case modifiers.HIGH_WIND:
                     modLayer.GetComponent<Renderer>().material = modTiles[2];
-                    modifierTypes[2] = true;
+                    mod = modifiers.HIGH_WIND;
                     break;
                 case modifiers.RIVER:
                     modLayer.GetComponent<Renderer>().material = modTiles[3];
-                    modifierTypes[3] = true;
+                    mod = modifiers.RIVER;
                     break;
                 case modifiers.EARTHQUAKE:
                     modLayer.GetComponent<Renderer>().material = modTiles[4];
-                    modifierTypes[4] = true;
+                    mod = modifiers.EARTHQUAKE;
                     break;
                 case modifiers.NATURAL_GAS:
                     modLayer.GetComponent<Renderer>().material = modTiles[5];
-                    modifierTypes[5] = true;
+                    mod = modifiers.NATURAL_GAS;
                     break;
                 case modifiers.DENSE_TREES:
                     modLayer.GetComponent<Renderer>().material = modTiles[6];
-                    modifierTypes[6] = true;
+                    mod = modifiers.DENSE_TREES;
                     break;
                 case modifiers.COAL:
                     modLayer.GetComponent<Renderer>().material = modTiles[7];
-                    modifierTypes[7] = true;
+                    mod = modifiers.COAL;
                     break;
             }
             modLayer.SetActive(true);
@@ -260,18 +259,31 @@ public class mapMakerTile : MonoBehaviour {
             modLayer.SetActive(false);
         }
     }
-    public void setCity(bool set)
+    public void setCity(bool set, cities size)
     {
+        hasCity = cities.NONE;
         if (set)
         {
-            buildingLayer.GetComponent<Renderer>().material = city;
+            switch (size)
+            {
+                case cities.SMALL:
+                    buildingLayer.GetComponent<Renderer>().material = sCity;
+                    hasCity = cities.SMALL;
+                    break;
+                case cities.MEDIUM:
+                    buildingLayer.GetComponent<Renderer>().material = mCity;
+                    hasCity = cities.MEDIUM;
+                    break;
+                case cities.LARGE:
+                    buildingLayer.GetComponent<Renderer>().material = lCity;
+                    hasCity = cities.LARGE;
+                    break;
+            }
             buildingLayer.SetActive(true);
-            hasCity = true;
         }
         else
         {
             buildingLayer.SetActive(false);
-            hasCity = false;
         }
     }
 
